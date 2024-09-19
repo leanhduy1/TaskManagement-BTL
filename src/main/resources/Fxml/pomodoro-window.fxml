@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="500.0" prefWidth="434.0" stylesheets="@../Styles/back-ground-style.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.btl.taskmanagement.Controllers.CalendarWindowController">
+    <!-- Top section -->
+    <ChoiceBox layoutX="142.0" layoutY="21.0" prefWidth="150.0" style="-fx-background-color: white;" />
+    <Button alignment="CENTER" layoutX="14.0" layoutY="12.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="52.0" style="-fx-background-radius: 150;" text="Exit">
+        <font>
+            <Font size="17.0" />
+        </font>
+    </Button>
+
+    <!-- Center section -->
+    <Circle fill="#d93131" layoutX="217.0" layoutY="227.0" radius="110.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="2.5" />
+    <Label alignment="CENTER" layoutX="161.0" layoutY="164.0" prefHeight="55.0" prefWidth="112.0" text="25:00" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+        <font>
+            <Font name="Arial Narrow" size="44.0" />
+        </font>
+    </Label>
+    <Circle accessibleRole="BUTTON" fill="#ea4848" layoutX="217.0" layoutY="277.0" radius="24.0" stroke="WHITE" strokeType="OUTSIDE" strokeWidth="3.0" />
+    <Polygon fill="WHITE" layoutX="220.0" layoutY="287.0" mouseTransparent="true" rotate="90.0" scaleX="0.2" scaleY="0.2" scaleZ="0.2" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0">
+        <points>
+            <Double fx:value="-50.0" />
+            <Double fx:value="40.0" />
+            <Double fx:value="50.0" />
+            <Double fx:value="40.0" />
+            <Double fx:value="0.0" />
+            <Double fx:value="-60.0" />
+        </points>
+    </Polygon>
+    <ImageView fitHeight="35.0" fitWidth="39.0" layoutX="308.0" layoutY="-4.0" pickOnBounds="true" preserveRatio="true" />
+
+    <!-- Bottom section -->
+    <Label alignment="CENTER" layoutX="151.0" layoutY="455.0" prefHeight="28.0" prefWidth="132.0" style="-fx-background-color: #d93131; -fx-background-radius: 10; -fx-border-radius: 10;" text="Focused time: none" textFill="WHITE">
+        <font>
+            <Font name="Arial Narrow Bold" size="15.0" />
+        </font>
+    </Label>
+    <Label alignment="CENTER" layoutX="133.0" layoutY="400.0" prefHeight="41.0" prefWidth="168.0" style="-fx-background-color: lightblue; -fx-border-color: black; -fx-border-image-width: 2px; -fx-border-radius: 20px; -fx-background-radius: 20px; -fx-background-image: 'org/example/task_management/background-image.jpeg';" text="BREAK">
+        <font>
+            <Font name="Arial Narrow" size="29.0" />
+        </font>
+    </Label>
+</AnchorPane>
