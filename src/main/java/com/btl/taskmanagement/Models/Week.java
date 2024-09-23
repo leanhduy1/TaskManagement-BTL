@@ -1,16 +1,16 @@
 package com.btl.taskmanagement.Models;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Week {
-	private List<Day> dayList;
-	private LocalDate startDate;
-	
-	public ArrayList<Day> getDayList() {
-		return (ArrayList<Day>) dayList;
-	}
+public class Week implements Serializable {
+	@Serial
+	private static final long serialVersionUID = 1L;
+	private final List<Day> dayList;
+	private final LocalDate startDate;
 	
 	public Week(LocalDate startDate) {
 		this.startDate = startDate;
@@ -19,9 +19,4 @@ public class Week {
 			dayList.add(new Day(startDate.plusDays(i)));
 		}
 	}
-	
-	
-	
-	
-	
 }

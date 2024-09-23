@@ -1,89 +1,32 @@
 package com.btl.taskmanagement.Models;
 
-import javafx.beans.property.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalTime;
 
-public class Task {
-	private final StringProperty taskName = new SimpleStringProperty();
-	private final ObjectProperty<LocalTime> startTime = new SimpleObjectProperty<>();
-	private final ObjectProperty<Duration> focusTime =  new SimpleObjectProperty<>();
-	private final ObjectProperty<Duration> breakTime =  new SimpleObjectProperty<>();
-	private final StringProperty taskCategory = new SimpleStringProperty();
-	private final IntegerProperty importanceLevel = new SimpleIntegerProperty();
+public class Task implements Serializable {
+	@Serial
+	private static final long serialVersionUID = 1L;
+	private final String taskName;
+	private final LocalTime startTime;
+	private final Duration focusTime;
+	private final Duration breakTime;
+	private final String taskCategory;
+	private final int importanceLevel;
+	private boolean completed = false;
 	
-	
-	public StringProperty taskNameProperty() {
-		return taskName;
+	public Task(String taskName, LocalTime startTime, Duration focusTime, Duration breakTime, String taskCategory, int importanceLevel) {
+		this.taskName = taskName;
+		this.startTime = startTime;
+		this.focusTime = focusTime;
+		this.breakTime = breakTime;
+		this.taskCategory = taskCategory;
+		this.importanceLevel = importanceLevel;
 	}
 	
-	public ObjectProperty<LocalTime> startTimeProperty() {
-		return startTime;
-	}
 	
-	public ObjectProperty<Duration> focusTimeProperty() {
-		return focusTime;
-	}
 	
-	public ObjectProperty<Duration> breakTimeProperty() {
-		return breakTime;
-	}
-	
-	public StringProperty taskCategoryProperty() {
-		return taskCategory;
-	}
-	
-	public IntegerProperty importanceLevelProperty() {
-		return importanceLevel;
-	}
-	
-	public String getTaskName() {
-		return taskName.get();
-	}
-	
-	public void setTaskName(String taskName) {
-		this.taskName.set(taskName);
-	}
-	
-	public LocalTime getStartTime() {
-		return startTime.get();
-	}
-	
-	public void setStartTime(LocalTime startTime) {
-		this.startTime.set(startTime);
-	}
-	
-	public Duration getFocusTime() {
-		return focusTime.get();
-	}
-	
-	public void setFocusTime(Duration focusTime) {
-		this.focusTime.set(focusTime);
-	}
-	
-	public Duration getBreakTime() {
-		return breakTime.get();
-	}
-	
-	public void setBreakTime(Duration breakTime) {
-		this.breakTime.set(breakTime);
-	}
-	
-	public String getTaskCategory() {
-		return taskCategory.get();
-	}
-	
-	public void setTaskCategory(String taskCategory) {
-		this.taskCategory.set(taskCategory);
-	}
-	
-	public int getImportanceLevel() {
-		return importanceLevel.get();
-	}
-	
-	public void setImportanceLevel(int importanceLevel) {
-		this.importanceLevel.set(importanceLevel);
-	}
 }
 	
