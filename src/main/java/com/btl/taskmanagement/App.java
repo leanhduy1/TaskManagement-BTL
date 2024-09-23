@@ -4,16 +4,16 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 
 public class App extends Application {
 	@Override
-	public void start(Stage stage) throws IOException {
-		FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/Fxml/pomodoro-window.fxml"));
-		Scene scene = new Scene(fxmlLoader.load());
-		stage.setScene(scene);
-		stage.show();
+	public void start(Stage stage) throws IOException, InterruptedException {
+		FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/Fxml/main-window.fxml"));
+		Scene mainWindow = new Scene(fxmlLoader.load());
+		ViewFactory.stage = stage;
+		ViewFactory.mainWindow = mainWindow;
+		ViewFactory.switchToMainWindow();
 	}
 	
 	public static void main(String[] args) {

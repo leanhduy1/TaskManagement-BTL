@@ -8,10 +8,14 @@ import java.util.TreeMap;
 public class Calendar {
 	private Map<LocalDate, Week> weeks = new TreeMap<>();
 	private Week currentWeek;
+	private LocalDate currentTime;
 	
 	public Calendar() {
 		weeks = new TreeMap<>();
 	}
 	
+	private void XacDinhDauTuan(){
+	
+	}
 	
 }
