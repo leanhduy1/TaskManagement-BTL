@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public class App extends Application {
 	@Override
-	public void start(Stage stage) throws IOException, InterruptedException {
+	public void start(Stage stage) throws IOException {
 		FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/Fxml/main-window.fxml"));
 		Scene mainWindow = new Scene(fxmlLoader.load());
 		ViewFactory.stage = stage;
