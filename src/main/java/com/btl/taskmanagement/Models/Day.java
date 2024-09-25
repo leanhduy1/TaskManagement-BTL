@@ -5,9 +5,7 @@ import javafx.collections.ObservableList;
 
 import java.io.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 public class Day implements Serializable {
 	@Serial

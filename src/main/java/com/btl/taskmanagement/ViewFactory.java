@@ -26,6 +26,7 @@ public class ViewFactory {
 	}
 	
 	public static void switchToPomodoroWindow() throws IOException {
+		stage.resizableProperty().setValue(false);
 		switchScene("/FXML/pomodoro-window.fxml");
 	}
 	
