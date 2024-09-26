@@ -14,7 +14,6 @@ public class App extends Application {
 		ViewFactory.stage = stage;
 		ViewFactory.mainWindow = mainWindow;
 		ViewFactory.switchToMainWindow();
-		
 	}
 	
 	public static void main(String[] args) {
