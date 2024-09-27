@@ -38,6 +38,7 @@ public class PomodoroController implements Initializable {
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
+		// tạo tạm task để test
 		this.task = new Task("", LocalTime.now(), Duration.minutes(DEFAULT_FOCUS_TIME), Duration.minutes(DEFAULT_BREAK_TIME), "", Task.Priority.LOW, Duration.minutes(DEFAULT_FOCUS_TIME));
 		countdownLabel.setText(formatTime((int) task.getFocusTime().toSeconds()));
 		
