@@ -1,5 +1,7 @@
 package com.btl.taskmanagement;
 
+import com.btl.taskmanagement.Models.Day;
+import com.btl.taskmanagement.Models.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -12,6 +14,8 @@ public class ViewFactory {
 	public static Scene scene;
 	public static Scene mainWindow;
 	public static Parent root;
+	public static Day selectedDay;
+	public static Task selectedTask;
 	
 	public static void switchScene(String path) throws IOException {
 		FXMLLoader loader = new FXMLLoader(ViewFactory.class.getResource(path));

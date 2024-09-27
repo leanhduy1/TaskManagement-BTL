@@ -1,7 +1,7 @@
 package com.btl.taskmanagement.Controllers;
 
 import com.btl.taskmanagement.Models.Music;
-import com.btl.taskmanagement.Models.Pomodoro;
+import com.btl.taskmanagement.Models.Task;
 import com.btl.taskmanagement.ViewFactory;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -15,6 +15,7 @@ import javafx.util.Duration;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalTime;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -22,7 +23,7 @@ public class PomodoroController implements Initializable {
 	private static final int DEFAULT_FOCUS_TIME = 25; // phút
 	private static final int DEFAULT_BREAK_TIME = 5; // phút
 	
-	private Pomodoro pomodoro;
+	private Task task;
 	private Timeline timeline;
 	private Music music;
 	private int songNumber;
@@ -37,8 +38,8 @@ public class PomodoroController implements Initializable {
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
-		this.pomodoro = new Pomodoro(Duration.minutes(DEFAULT_FOCUS_TIME), Duration.minutes(DEFAULT_BREAK_TIME), Duration.minutes(25));
-		countdownLabel.setText(formatTime((int) pomodoro.getFocusTime().toSeconds()));
+		this.task = new Task("", LocalTime.now(), Duration.minutes(DEFAULT_FOCUS_TIME), Duration.minutes(DEFAULT_BREAK_TIME), "", Task.Priority.LOW, Duration.minutes(DEFAULT_FOCUS_TIME));
+		countdownLabel.setText(formatTime((int) task.getFocusTime().toSeconds()));
 		
 		timeline = new Timeline(new KeyFrame(Duration.seconds(1), _ -> updateCountdown()));
 		timeline.setCycleCount(Timeline.INDEFINITE);
@@ -94,13 +95,13 @@ public class PomodoroController implements Initializable {
 	}
 	
 	private void updateCountdown() {
-		pomodoro.updateTime(Duration.seconds(1));
-		if (pomodoro.isFinishedSession()) {
-			if (pomodoro.isBreak()) {
-				pomodoro.startFocus();
+		task.updateTime(Duration.seconds(1));
+		if (task.isFinishedSession()) {
+			if (task.isBreak()) {
+				task.startFocus();
 				modeLabel.setText("Focus");
 			} else {
-				pomodoro.startBreak();
+				task.startBreak();
 				modeLabel.setText("Break");
 			}
 		}
@@ -108,8 +109,8 @@ public class PomodoroController implements Initializable {
 	}
 	
 	private void updateUI() {
-		countdownLabel.setText(formatTime((int) pomodoro.getRemainingTime().toSeconds()));
-		totalTimeLabel.setText("Focused Time: " + formatTime((int) pomodoro.getTotalTime().toSeconds()));
+		countdownLabel.setText(formatTime((int) task.getRemainingTime().toSeconds()));
+		totalTimeLabel.setText("Focused Time: " + formatTime((int) task.getTotalTime().toSeconds()));
 	}
 	
 	private String formatTime(int seconds) {
@@ -126,8 +127,8 @@ public class PomodoroController implements Initializable {
 	
 	@FXML
 	public void startPomodoro() {
-		if (!pomodoro.isRunning()) {
-			pomodoro.startFocus();
+		if (!task.isRunning()) {
+			task.startFocus();
 			updateUI();
 			timeline.play();
 			modeLabel.setText("Focus");
@@ -136,8 +137,8 @@ public class PomodoroController implements Initializable {
 	
 	@FXML
 	public void stopPomodoro() {
-		if (pomodoro.isRunning()) {
-			pomodoro.stop();
+		if (task.isRunning()) {
+			task.stop();
 			timeline.stop();
 			modeLabel.setText("Break");
 		}
@@ -145,12 +146,12 @@ public class PomodoroController implements Initializable {
 	
 	@FXML
 	private void handleExit() throws IOException {
-		if (pomodoro.isMandatoryTimeMet()) {
+		if (task.isMandatoryTimeMet()) {
 			ViewFactory.switchToDayWindow();
 		} else {
 			Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 			alert.setTitle("Xác nhận thoát");
-			int totalRemainTime = (int) pomodoro.getMandatoryTime().subtract(pomodoro.getTotalTime()).toSeconds();
+			int totalRemainTime = (int) task.getMandatoryTime().subtract(task.getTotalTime()).toSeconds();
 			int minutes = totalRemainTime / 60;
 			int seconds = totalRemainTime % 60;
 			alert.setContentText(String.format("Còn %d phút %d giây nữa để hoàn thành\nTask sẽ tính là không hoàn thành nếu bạn thoát bây giờ", minutes, seconds));

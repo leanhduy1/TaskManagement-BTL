@@ -4,3 +4,15 @@
     -fx-background-position: center;
     -fx-background-repeat: no-repeat;
 }
+.list-cell {
+    -fx-border-color: transparent;
+    -fx-background-color: transparent;
+    -fx-background-radius: 100;
+    -fx-border-radius: 100;
+}
+
+.list-view {
+    -fx-background-color: transparent; /* Xóa nền của ListView */
+    -fx-border-color: #d93131;
+    -fx-border-width: 2;
+}

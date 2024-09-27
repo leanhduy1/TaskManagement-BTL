@@ -11,6 +11,7 @@ module com.btl.taskmanagement {
 	requires eu.hansolo.tilesfx;
 	requires com.almasb.fxgl.all;
 	requires javafx.media;
+	requires java.desktop;
 	
 	opens com.btl.taskmanagement to javafx.fxml;
 	opens com.btl.taskmanagement.Controllers to javafx.fxml;
