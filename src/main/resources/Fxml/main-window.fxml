@@ -7,21 +7,21 @@
 <BorderPane prefHeight="400.0" prefWidth="600.0" stylesheets="@../Styles/back-ground-style.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.btl.taskmanagement.Controllers.CalendarWindowController">
     <top>
         <HBox alignment="CENTER" prefHeight="71.0" prefWidth="600.0" spacing="10.0" BorderPane.alignment="CENTER">
-            <Button mnemonicParsing="false" text="Previous" />
-            <DatePicker />
-            <Button mnemonicParsing="false" text="Next" />
+            <Button fx:id="previousButton" mnemonicParsing="false" text="Previous" />
+            <DatePicker fx:id="datePicker" editable="false" />
+            <Button fx:id="nextButton" mnemonicParsing="false" text="Next" />
         </HBox>
     </top>
     <center>
         <TableView style="-fx-background-color: rgba(255, 255, 255, 0.4); -fx-border-width: 1; -fx-border-color: black;" BorderPane.alignment="CENTER">
             <columns>
-                <TableColumn prefWidth="75.0" text="Monday" />
-                <TableColumn prefWidth="75.0" text="Tuesday" />
-                <TableColumn prefWidth="75.0" text="Wednesday" />
-                <TableColumn prefWidth="75.0" text="Thursday" />
-                <TableColumn prefWidth="75.0" text="Friday" />
-                <TableColumn prefWidth="75.0" text="Saturday" />
-                <TableColumn prefWidth="75.0" text="Sunday" />
+                <TableColumn prefWidth="75.0" text="Monday" reorderable="false"/>
+                <TableColumn prefWidth="75.0" text="Tuesday" reorderable="false"/>
+                <TableColumn prefWidth="75.0" text="Wednesday" reorderable="false"/>
+                <TableColumn prefWidth="75.0" text="Thursday" reorderable="false"/>
+                <TableColumn prefWidth="75.0" text="Friday" reorderable="false"/>
+                <TableColumn prefWidth="75.0" text="Saturday" reorderable="false"/>
+                <TableColumn prefWidth="75.0" text="Sunday" reorderable="false"/>
             </columns>
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
