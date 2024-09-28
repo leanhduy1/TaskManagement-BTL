@@ -38,7 +38,7 @@ public class Calendar {
 		String userHome = System.getProperty("user.home");
 		File directory = new File(userHome + "/Documents/saved-weeks");
 		if (!directory.exists()) {
-			directory.mkdirs();
+			directory.mkdir();
 		}
 		
 		String filename = directory.getPath() + "/" + startOfWeek.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + ".dat";

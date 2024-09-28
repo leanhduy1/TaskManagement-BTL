@@ -7,9 +7,9 @@
 <BorderPane prefHeight="400.0" prefWidth="600.0" stylesheets="@../Styles/back-ground-style.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.btl.taskmanagement.Controllers.CalendarWindowController">
     <top>
         <HBox alignment="CENTER" prefHeight="71.0" prefWidth="600.0" spacing="10.0" BorderPane.alignment="CENTER">
-            <Button mnemonicParsing="false" text="Previous" />
-            <DatePicker />
-            <Button mnemonicParsing="false" text="Next" />
+            <Button fx:id="previousButton" mnemonicParsing="false" text="Previous" />
+            <DatePicker fx:id="datePicker" />
+            <Button fx:id="nextButton" mnemonicParsing="false" text="Next" />
         </HBox>
     </top>
     <center>
