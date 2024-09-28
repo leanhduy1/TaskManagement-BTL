@@ -11,31 +11,23 @@ public class Calendar {
 	private final Map<LocalDate, Week> weeks = new TreeMap<>();
 	private Week currentWeek;
 	private LocalDate startOfWeek;
-	
+	private LocalDate currentDate;
+    private boolean isInitial;
+    
+    public boolean isInitial() {
+        return isInitial;
+    }
+     
 	public Calendar() throws IOException, ClassNotFoundException {
-		LocalDate today = LocalDate.now();
-		this.startOfWeek = today.with(DayOfWeek.MONDAY);
+		this.currentDate = LocalDate.now();
+		this.startOfWeek = currentDate.with(DayOfWeek.MONDAY);
+        this.isInitial = true;  
 		updateCurrentWeek();
 	}
 	
 	public Week getCurrentWeek() {
 		return currentWeek;
 	}
-	
-	public LocalDate getStartOfWeek() {
-		return startOfWeek;
-	}
-	
-	public void setToNextWeek() throws IOException, ClassNotFoundException {
-		this.startOfWeek = this.startOfWeek.plusWeeks(1);
-		updateCurrentWeek();
-	}
-	
-	public void setToPreviousWeek() throws IOException, ClassNotFoundException {
-		this.startOfWeek = this.startOfWeek.minusWeeks(1);
-		updateCurrentWeek();
-	}
-	
 	
 	public void updateCurrentWeek() throws IOException, ClassNotFoundException {
 		if (weeks.containsKey(startOfWeek)) {
@@ -59,6 +51,54 @@ public class Calendar {
 		ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
 		currentWeek = (Week) ois.readObject();
 		weeks.put(startOfWeek, currentWeek);
+	}
+	
+	public void addWeek() {
+	    if (!weeks.containsKey(startOfWeek)) {
+	        Week week = new Week(startOfWeek);  
+	        weeks.put(startOfWeek, week);
+	    }
+	}
+	
+	public Week getWeek(LocalDate date) throws IOException, ClassNotFoundException {
+	    LocalDate startOfWeek = date.with(DayOfWeek.MONDAY);
+	    if (!weeks.containsKey(startOfWeek)) {
+	        setToWeekOfDate(date);  
+	    }
+	    return weeks.get(startOfWeek);
+	}
+	
+	public LocalDate getStartOfWeek() {
+		return startOfWeek;
+	}
+	
+	public void determineCurrentWeek(LocalDate date) throws IOException, ClassNotFoundException {
+	    setToWeekOfDate(date);
+	}
+	
+	public LocalDate getCurrentDate() {
+	    return currentDate;
+	}
+	
+	public void setToWeekOfDate(LocalDate date) throws IOException, ClassNotFoundException { 
+        this.startOfWeek = date.with(DayOfWeek.MONDAY);
+        this.currentDate = date; 
+        isInitial = false; 
+        updateCurrentWeek();
+    }
+	
+	public void setToNextWeek() throws IOException, ClassNotFoundException {
+		this.startOfWeek = this.startOfWeek.plusWeeks(1);
+	    this.currentDate = this.currentDate.plusWeeks(1);  
+        isInitial = false; 
+		updateCurrentWeek();
+	}
+	
+	public void setToPreviousWeek() throws IOException, ClassNotFoundException {
+		this.startOfWeek = this.startOfWeek.minusWeeks(1);
+	    this.currentDate = this.currentDate.minusWeeks(1);  
+        isInitial = false;  
+		updateCurrentWeek();
 	}
 	
 	public void saveWeeksToFile() throws IOException {
