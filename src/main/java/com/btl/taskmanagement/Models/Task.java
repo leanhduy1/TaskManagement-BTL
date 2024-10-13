@@ -9,7 +9,7 @@ import java.time.LocalTime;
 public class Task implements Serializable {
 	@Serial
 	private static final long serialVersionUID = 1L;
-	
+
 	public enum State {
 		FOCUS, BREAK, STOPPED
 	}
@@ -74,7 +74,15 @@ public class Task implements Serializable {
 			}
 		}
 	}
-	
+
+	public Duration getBreakTime() {
+		return breakTime;
+	}
+
+	public String getTaskCategory() {
+		return taskCategory;
+	}
+
 	public String getTaskName() {
 		return taskName;
 	}

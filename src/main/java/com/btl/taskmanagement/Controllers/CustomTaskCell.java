@@ -4,16 +4,11 @@ import com.btl.taskmanagement.Models.Task;
 import com.btl.taskmanagement.ViewFactory;
 import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.paint.Color;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.geometry.Insets;
 import javafx.scene.effect.ColorAdjust;
 
@@ -27,52 +22,70 @@ public class CustomTaskCell extends ListCell<Task> {
 		} else {
 			HBox cell = new HBox();
 			cell.setSpacing(10);
-			
+
+			GridPane taskInfo = new GridPane();
+			taskInfo.setVgap(5);
+			taskInfo.setHgap(10);
+
+			// Tên nhiệm vụ và loại được hiển thị cùng nhau
 			Text taskName = new Text(item.getTaskName());
-			taskName.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-			
-			CornerRadii cornerRadii = new CornerRadii(0);
-			
-			// Set brighter colors for each importance level
-			BackgroundFill backgroundFill = null;
-			switch (item.getImportanceLevel()) {
-				case LOW:
-					backgroundFill = new BackgroundFill(Color.web("#90EE90"), cornerRadii, Insets.EMPTY);
-					taskName.setFill(Color.web("#006400"));
-					break;
-				case MEDIUM:
-					backgroundFill = new BackgroundFill(Color.web("#FFD700"), cornerRadii, Insets.EMPTY);
-					taskName.setFill(Color.web("#D93131"));
-					break;
-				case HIGH:
-					backgroundFill = new BackgroundFill(Color.web("#FF6F61"), cornerRadii, Insets.EMPTY);
-					taskName.setFill(Color.WHITE);
-					break;
-			}
-			
+			taskName.setFont(Font.font("System", FontWeight.BOLD, 14));
+			taskName.setFill(Color.BLACK);
+			taskInfo.add(taskName, 0, 0); // Tên nhiệm vụ ở hàng 0, cột 0
+
+
+			// Thêm thời gian bắt đầu vào cột 1, hàng 0
+			Text startTime = new Text("Start: " + item.getStartTime());
+			startTime.setFont(Font.font("System", FontWeight.NORMAL, 12));
+			startTime.setFill(Color.BLACK);
+			taskInfo.add(startTime, 0, 1); // Thời gian bắt đầu ở hàng 1, cột 0
+
+			// Thời gian tối thiểu và thời gian làm
+			Text mandatoryTime = new Text("Min: " + item.getMandatoryTime().toMinutes() + " min");
+			mandatoryTime.setFont(Font.font("System", FontWeight.NORMAL, 12));
+			mandatoryTime.setFill(Color.BLACK);
+			taskInfo.add(mandatoryTime, 1, 1); // Thời gian tối thiểu ở hàng 1, cột 1
+
+			// Thời gian làm và nghỉ
+			Text focusTime = new Text("Focus: " + item.getFocusTime().toMinutes() + " min");
+			focusTime.setFont(Font.font("System", FontWeight.NORMAL, 12));
+			focusTime.setFill(Color.BLACK);
+			taskInfo.add(focusTime, 0, 2); // Thời gian làm ở hàng 2, cột 0
+
+			Text breakTime = new Text("Break: " + item.getBreakTime().toMinutes() + " min");
+			breakTime.setFont(Font.font("System", FontWeight.NORMAL, 12));
+			breakTime.setFill(Color.BLACK);
+			taskInfo.add(breakTime, 1, 2); // Thời gian nghỉ ở hàng 2, cột 1
+
+			// Đặt màu nền cho từng mức độ quan trọng
+			BackgroundFill backgroundFill = switch (item.getImportanceLevel()) {
+				case LOW -> new BackgroundFill(Color.web("#A8E6CF"), new CornerRadii(5), Insets.EMPTY);
+				case MEDIUM -> new BackgroundFill(Color.web("#FFD54F"), new CornerRadii(5), Insets.EMPTY);
+				case HIGH -> new BackgroundFill(Color.web("#FFAB91"), new CornerRadii(5), Insets.EMPTY);
+			};
+
 			cell.setBackground(new Background(backgroundFill));
-			
-			// Kiểm tra nếu cell được chọn và làm sáng màu nền
+
+			// Hiệu ứng khi mục được chọn
 			if (isSelected()) {
 				ColorAdjust colorAdjust = new ColorAdjust();
-				colorAdjust.setBrightness(-0.3); // Làm sáng hơn 30%
+				colorAdjust.setBrightness(-0.2);
 				cell.setEffect(colorAdjust);
-				ViewFactory.selectedTask = item; // lưu task để chuyển sang pomodoro window
+				ViewFactory.selectedTask = item;
 			} else {
 				cell.setEffect(null);
 			}
-			
-			cell.getChildren().addAll(taskName);
-			
-			// Spacer để mở rộng cell theo chiều ngang
+
+			cell.getChildren().addAll(taskInfo);
+
 			Region spacer = new Region();
 			HBox.setHgrow(spacer, Priority.ALWAYS);
 			cell.getChildren().add(spacer);
-			
-			cell.setPrefHeight(60);
+
+			cell.setPrefHeight(80);
 			cell.setAlignment(Pos.CENTER_LEFT);
-			cell.setPadding(new Insets(0, 10, 0, 10));
-			
+			cell.setPadding(new Insets(10, 10, 10, 10));
+
 			setGraphic(cell);
 			setText(null);
 		}

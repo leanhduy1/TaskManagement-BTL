@@ -13,7 +13,7 @@ public class App extends Application {
 		Scene mainWindow = new Scene(fxmlLoader.load());
 		ViewFactory.stage = stage;
 		ViewFactory.mainWindow = mainWindow;
-		ViewFactory.switchToMainWindow();
+		ViewFactory.switchToDayWindow();
 	}
 	
 	public static void main(String[] args) {

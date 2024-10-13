@@ -50,7 +50,6 @@ public class PomodoroController implements Initializable {
 		if(!music.getSongs().isEmpty()){
 			setUpListSong();
 		}
-		
 	}
 	
 	private void setUpListSong(){
