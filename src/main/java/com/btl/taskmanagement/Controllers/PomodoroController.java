@@ -10,6 +10,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.File;
@@ -33,6 +34,8 @@ public class PomodoroController implements Initializable {
 	@FXML
 	private Button playPauseButton, exitButton;
 	
+	
+	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
 		this.task = ViewController.selectedTask;
@@ -47,6 +50,14 @@ public class PomodoroController implements Initializable {
 			setUpListSong();
 		}
 		
+		ViewController.stage.setOnCloseRequest(event -> {
+			event.consume();
+			try {
+				handleExit();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		});
 	}
 	
 	private void setUpListSong(){
@@ -157,6 +168,7 @@ public class PomodoroController implements Initializable {
 			if (result.isPresent() && result.get() == ButtonType.OK) {
 				task.setTaskFailed();
 				ViewController.switchToDayWindow();
+				ViewController.stage.setOnCloseRequest(null);
 			}
 		}
 		if (mediaPlayer != null) {
