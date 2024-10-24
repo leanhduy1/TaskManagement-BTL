@@ -2,7 +2,7 @@ package com.btl.taskmanagement.Controllers;
 
 import com.btl.taskmanagement.Models.Music;
 import com.btl.taskmanagement.Models.Task;
-import com.btl.taskmanagement.ViewFactory;
+import com.btl.taskmanagement.ViewController;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
@@ -15,13 +15,10 @@ import javafx.util.Duration;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.time.LocalTime;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class PomodoroController implements Initializable {
-	private static final int DEFAULT_FOCUS_TIME = 25; // phút
-	private static final int DEFAULT_BREAK_TIME = 5; // phút
 	
 	private Task task;
 	private Timeline timeline;
@@ -38,8 +35,7 @@ public class PomodoroController implements Initializable {
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
-		// tạo tạm task để test
-		this.task = new Task("", LocalTime.now(), Duration.minutes(DEFAULT_FOCUS_TIME), Duration.minutes(DEFAULT_BREAK_TIME), "", Task.Priority.LOW, Duration.minutes(DEFAULT_FOCUS_TIME));
+		this.task = ViewController.selectedTask;
 		countdownLabel.setText(formatTime((int) task.getFocusTime().toSeconds()));
 		
 		timeline = new Timeline(new KeyFrame(Duration.seconds(1), _ -> updateCountdown()));
@@ -110,7 +106,7 @@ public class PomodoroController implements Initializable {
 	}
 	
 	private void updateUI() {
-		countdownLabel.setText(formatTime((int) task.getRemainingTime().toSeconds()));
+		countdownLabel.setText(formatTime((int) task.getSessionRemainingTime().toSeconds()));
 		totalTimeLabel.setText("Focused Time: " + formatTime((int) task.getTotalTime().toSeconds()));
 	}
 	
@@ -147,8 +143,9 @@ public class PomodoroController implements Initializable {
 	
 	@FXML
 	private void handleExit() throws IOException {
-		if (task.isMandatoryTimeMet()) {
-			ViewFactory.switchToDayWindow();
+		if (task.getTotalTime().greaterThanOrEqualTo(task.getMandatoryTime())) {
+			task.setTaskDone();
+			ViewController.switchToDayWindow();
 		} else {
 			Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 			alert.setTitle("Xác nhận thoát");
@@ -158,7 +155,8 @@ public class PomodoroController implements Initializable {
 			alert.setContentText(String.format("Còn %d phút %d giây nữa để hoàn thành\nTask sẽ tính là không hoàn thành nếu bạn thoát bây giờ", minutes, seconds));
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.isPresent() && result.get() == ButtonType.OK) {
-				ViewFactory.switchToDayWindow();
+				task.setTaskFailed();
+				ViewController.switchToDayWindow();
 			}
 		}
 		if (mediaPlayer != null) {

@@ -1,6 +1,6 @@
 package com.btl.taskmanagement.Controllers;
 
-import com.btl.taskmanagement.ViewFactory;
+import com.btl.taskmanagement.ViewController;
 import javafx.application.Platform;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
@@ -12,7 +12,7 @@ import java.time.LocalTime;
 public class StatusUpdateService extends ScheduledService<Void> {
 	
 	public StatusUpdateService() {
-		setPeriod(Duration.minutes(1));
+		setPeriod(Duration.seconds(1));
 	}
 	
 	@Override
@@ -28,8 +28,7 @@ public class StatusUpdateService extends ScheduledService<Void> {
 	
 	
 	private void updateStatus() {
-		System.out.println("UPDATING STATUS");
-		ViewFactory.selectedDay.getTaskObservableList().forEach(task -> {
+		ViewController.selectedDay.getTaskObservableList().forEach(task -> {
 			if (task.isReady() && task.getStartTime().isBefore(LocalTime.now())) {
 				Platform.runLater(task::setTaskFailed);
 			}

@@ -1,17 +1,19 @@
 package com.btl.taskmanagement.Models;
 
-
 import java.io.Serial;
 import java.io.Serializable;
-import javafx.util.Duration;
 import java.time.LocalTime;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.util.Duration;
 
 public class Task implements Serializable {
 	@Serial
 	private static final long serialVersionUID = 1L;
 	
+	
 	public enum State {
-		FOCUS, BREAK, STOPPED
+		READY, FOCUS, BREAK, STOPPED, FAIL, DONE
 	}
 	
 	public enum Priority {
@@ -25,7 +27,11 @@ public class Task implements Serializable {
 	private final String taskCategory;
 	private final Priority importanceLevel;
 	private final Duration mandatoryTime;
+	
 	private State currentState;
+	
+	private transient ObjectProperty<State> currentStateProperty;
+	
 	private Duration sessionElapsedTime;
 	private Duration totalTime;
 	
@@ -37,11 +43,54 @@ public class Task implements Serializable {
 		this.taskCategory = taskCategory;
 		this.importanceLevel = importanceLevel;
 		this.mandatoryTime = mandatoryTime;
-		this.currentState = Task.State.STOPPED;
 		this.sessionElapsedTime = Duration.ZERO;
 		this.totalTime = Duration.ZERO;
+		this.currentState = State.READY;
+		this.currentStateProperty = new SimpleObjectProperty<>(currentState);
 	}
 	
+	public ObjectProperty<State> currentStateProperty() {
+		if (currentStateProperty == null) {
+			currentStateProperty = new SimpleObjectProperty<>(currentState);
+		}
+		return currentStateProperty;
+	}
+	
+	public void setCurrentState(State state) {
+		this.currentState = state;
+		this.currentStateProperty().set(state);
+	}
+	
+	public State getCurrentState() {
+		return currentState;
+	}
+	
+	public void startFocus() {
+		setCurrentState(State.FOCUS);
+		sessionElapsedTime = Duration.ZERO;
+	}
+	
+	public void startBreak() {
+		setCurrentState(State.BREAK);
+		sessionElapsedTime = Duration.ZERO;
+	}
+	
+	public void stop() {
+		setCurrentState(State.STOPPED);
+		sessionElapsedTime = Duration.ZERO;
+		totalTime = Duration.ZERO;
+	}
+	
+	public void updateTime(Duration duration) {
+		if (getCurrentState() == State.FOCUS || getCurrentState() == State.BREAK) {
+			sessionElapsedTime = sessionElapsedTime.add(duration);
+		}
+		if (getCurrentState() == State.FOCUS) {
+			totalTime = totalTime.add(duration);
+		}
+	}
+	
+	// Getter và Setter cho các thuộc tính khác
 	public Priority getImportanceLevel() {
 		return importanceLevel;
 	}
@@ -50,29 +99,12 @@ public class Task implements Serializable {
 		return startTime;
 	}
 	
-	public void startFocus() {
-		currentState = State.FOCUS;
-		sessionElapsedTime = Duration.ZERO;
+	public Duration getBreakTime() {
+		return breakTime;
 	}
 	
-	public void startBreak() {
-		currentState = State.BREAK;
-		sessionElapsedTime = Duration.ZERO;
-	}
-	
-	public void stop() {
-		currentState = State.STOPPED;
-		sessionElapsedTime = Duration.ZERO;
-		totalTime = Duration.ZERO;
-	}
-	
-	public void updateTime(Duration duration) {
-		if (currentState != State.STOPPED) {
-			sessionElapsedTime = sessionElapsedTime.add(duration);
-			if (currentState == State.FOCUS) {
-				totalTime = totalTime.add(duration);
-			}
-		}
+	public String getTaskCategory() {
+		return taskCategory;
 	}
 	
 	public String getTaskName() {
@@ -83,34 +115,55 @@ public class Task implements Serializable {
 		return totalTime;
 	}
 	
-	public Duration getRemainingTime() {
-		Duration time = currentState == State.BREAK ? breakTime : focusTime;
-		return time.subtract(sessionElapsedTime);
-	}
-	
-	public boolean isFinishedSession() {
-		return getRemainingTime().lessThanOrEqualTo(Duration.ZERO);
-	}
-	
-	public boolean isMandatoryTimeMet() {
-		return totalTime.greaterThanOrEqualTo(mandatoryTime);
+	public Duration getMandatoryTime() {
+		return mandatoryTime;
 	}
 	
 	public Duration getFocusTime() {
 		return focusTime;
 	}
 	
+	public Duration getSessionRemainingTime() {
+		Duration time = getCurrentState() == State.BREAK ? breakTime : focusTime;
+		return time.subtract(sessionElapsedTime);
+	}
+	
+	public boolean isFinishedSession() {
+		return getSessionRemainingTime().lessThanOrEqualTo(Duration.ZERO);
+	}
+	
+	public boolean isDone() {
+		return getCurrentState() == State.DONE;
+	}
+	
+	public boolean isReady() {
+		return getCurrentState() == State.READY;
+	}
+	
 	public boolean isRunning() {
-		return currentState != State.STOPPED;
+		return getCurrentState() == State.FOCUS || getCurrentState() == State.BREAK;
+	}
+	
+	public boolean isFocus() {
+		return getCurrentState() == State.FOCUS;
 	}
 	
 	public boolean isBreak() {
-		return currentState == State.BREAK;
+		return getCurrentState() == State.BREAK;
 	}
 	
-	public Duration getMandatoryTime(){
-		return mandatoryTime;
+	public boolean isFail() {
+		return getCurrentState() == State.FAIL;
 	}
+	
+	public void setTaskDone() {
+		setCurrentState(State.DONE);
+	}
+	
+	public void setTaskFailed() {
+		setCurrentState(State.FAIL);
+	}
+	
+	
 	
 }
-	

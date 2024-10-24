@@ -15,8 +15,19 @@ public class Week implements Serializable {
 	public Week(LocalDate startDate) {
 		this.startDate = startDate;
 		this.dayList = new ArrayList<>();
+		
 		for (int i = 0; i < 7; i++) {
-			dayList.add(new Day(startDate.plusDays(i)));
+			LocalDate dayDate = startDate.plusDays(i);
+			dayList.add(new Day(dayDate));
 		}
 	}
+	
+	public List<Day> getDayList() {
+		return dayList;
+	}
+	
+	public LocalDate getStartDate() {
+		return startDate;
+	}
+
 }

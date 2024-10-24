@@ -1,104 +1,65 @@
+// Calendar.java
 package com.btl.taskmanagement.Models;
 
 import java.io.*;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
-public class Calendar {
-	private final Map<LocalDate, Week> weeks = new TreeMap<>();
-	private Week currentWeek;
-	private LocalDate startOfWeek;
-	private LocalDate currentDate;
-    private boolean isInitial;
-    
-    public boolean isInitial() {
-        return isInitial;
-    }
-     
-	public Calendar() throws IOException, ClassNotFoundException {
-		this.currentDate = LocalDate.now();
-		this.startOfWeek = currentDate.with(DayOfWeek.MONDAY);
-        this.isInitial = true;  
-		updateCurrentWeek();
+public class Calendar implements Serializable {
+	@Serial
+	private static final long serialVersionUID = 1L;
+	
+	private final Map<LocalDate, Week> weeks = new HashMap<>();
+	private LocalDate startOfCurrentWeek;
+	
+	public Calendar() {
+		this.startOfCurrentWeek = LocalDate.now().with(DayOfWeek.MONDAY);
+		updateWeekMap();
 	}
 	
-	public Week getCurrentWeek() {
-		return currentWeek;
+	public void updateWeekMap() {
+		if(!weeks.containsKey(startOfCurrentWeek)) {
+			weeks.put(startOfCurrentWeek, loadWeek());
+		}
 	}
 	
-	public void updateCurrentWeek() throws IOException, ClassNotFoundException {
-		if (weeks.containsKey(startOfWeek)) {
-			currentWeek = weeks.get(startOfWeek);
-			return;
-		}
-		
-		String userHome = System.getProperty("user.home");
-		File directory = new File(userHome + "/Documents/saved-weeks");
-		if (!directory.exists()) {
-			directory.mkdirs();
-		}
-		
-		String filename = directory.getPath() + "/" + startOfWeek.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + ".dat";
-		File file = new File(filename);
+	private Week loadWeek() {
+		File file = new File(getWeekFilePath(startOfCurrentWeek));
 		if (!file.exists()) {
-			currentWeek = new Week(startOfWeek);
-			weeks.put(startOfWeek, currentWeek);
-			return;
+			return new Week(startOfCurrentWeek);
 		}
-		ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
-		currentWeek = (Week) ois.readObject();
-		weeks.put(startOfWeek, currentWeek);
+		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+			return (Week) ois.readObject();
+		} catch (IOException | ClassNotFoundException e) {
+			return new Week(startOfCurrentWeek);
+		}
 	}
 	
-	public void addWeek() {
-	    if (!weeks.containsKey(startOfWeek)) {
-	        Week week = new Week(startOfWeek);  
-	        weeks.put(startOfWeek, week);
-	    }
+	private String getWeekFilePath(LocalDate weekStart) {
+		String userHome = System.getProperty("user.home");
+		return userHome + "/Documents/saved-weeks/" + weekStart.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + ".dat";
 	}
 	
-	public Week getWeek(LocalDate date) throws IOException, ClassNotFoundException {
-	    LocalDate startOfWeek = date.with(DayOfWeek.MONDAY);
-	    if (!weeks.containsKey(startOfWeek)) {
-	        setToWeekOfDate(date);  
-	    }
-	    return weeks.get(startOfWeek);
+	public void setToNextWeek() {
+		startOfCurrentWeek = startOfCurrentWeek.plusWeeks(1);
+		updateWeekMap();
 	}
 	
-	public LocalDate getStartOfWeek() {
-		return startOfWeek;
+	public void setToPreviousWeek() {
+		startOfCurrentWeek = startOfCurrentWeek.minusWeeks(1);
+		updateWeekMap();
 	}
 	
-	public void determineCurrentWeek(LocalDate date) throws IOException, ClassNotFoundException {
-	    setToWeekOfDate(date);
+	public void setToAnotherWeek(LocalDate date) {
+		startOfCurrentWeek = date.with(DayOfWeek.MONDAY);
+		updateWeekMap();
 	}
 	
-	public LocalDate getCurrentDate() {
-	    return currentDate;
-	}
-	
-	public void setToWeekOfDate(LocalDate date) throws IOException, ClassNotFoundException { 
-        this.startOfWeek = date.with(DayOfWeek.MONDAY);
-        this.currentDate = date; 
-        isInitial = false; 
-        updateCurrentWeek();
-    }
-	
-	public void setToNextWeek() throws IOException, ClassNotFoundException {
-		this.startOfWeek = this.startOfWeek.plusWeeks(1);
-	    this.currentDate = this.currentDate.plusWeeks(1);  
-        isInitial = false; 
-		updateCurrentWeek();
-	}
-	
-	public void setToPreviousWeek() throws IOException, ClassNotFoundException {
-		this.startOfWeek = this.startOfWeek.minusWeeks(1);
-	    this.currentDate = this.currentDate.minusWeeks(1);  
-        isInitial = false;  
-		updateCurrentWeek();
+	public LocalDate getStartOfCurrentWeek() {
+		return startOfCurrentWeek;
 	}
 	
 	public void saveWeeksToFile() throws IOException {
@@ -109,16 +70,19 @@ public class Calendar {
 		}
 		
 		for (Map.Entry<LocalDate, Week> entry : weeks.entrySet()) {
-			LocalDate startOfWeek = entry.getKey();
+			LocalDate weekStart = entry.getKey();
 			Week week = entry.getValue();
-			
-			String filename = directory.getPath() + "/" + startOfWeek.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + ".dat";
-			
-			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename));
-			oos.writeObject(week);
+			try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(getWeekFilePath(weekStart)))) {
+				oos.writeObject(week);
+			}
 		}
 	}
 	
+	public Week getWeek(LocalDate date) {
+		return weeks.get(date);
+	}
+	
+	public Week getCurrentWeek() {
+		return weeks.get(startOfCurrentWeek);
+	}
 }
-
-
