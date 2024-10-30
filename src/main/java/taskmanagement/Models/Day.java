@@ -8,7 +8,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -31,13 +30,9 @@ public class Day implements Serializable {
 		return date;
 	}
 	
-	public boolean addTask(Task task) {
-		if (!isTimeConflict(task)) {
-			taskObservableList.add(task);
-			sortTasksByTime();
-			return true;
-		}
-		return false;
+	public void addTask(Task task) {
+		taskObservableList.add(task);
+		sortTasksByTime();
 	}
 	
 	public void removeTask(Task task) {
@@ -46,17 +41,6 @@ public class Day implements Serializable {
 	
 	public ObservableList<Task> getTaskObservableList() {
 		return taskObservableList;
-	}
-	
-	private boolean isTimeConflict(Task newTask) {
-		LocalTime newStart = newTask.getStartTime();
-		LocalTime newEnd = newStart.plusSeconds((long) newTask.getMandatoryTime().toSeconds());
-		
-		return taskObservableList.stream().anyMatch(existingTask -> {
-			LocalTime existingStart = existingTask.getStartTime();
-			LocalTime existingEnd = existingStart.plusSeconds((long) existingTask.getMandatoryTime().toSeconds());
-			return newStart.isBefore(existingEnd) && newEnd.isAfter(existingStart);
-		});
 	}
 	
 	private void sortTasksByTime() {

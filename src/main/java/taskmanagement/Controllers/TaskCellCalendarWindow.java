@@ -13,10 +13,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 
 public class TaskCellCalendarWindow extends ListCell<Task> {
-	
-	
-	
-	
 	@Override
 	protected void updateItem(Task task, boolean empty) {
 		super.updateItem(task, empty);

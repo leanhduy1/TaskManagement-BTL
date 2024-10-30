@@ -2,7 +2,7 @@ package com.btl.taskmanagement.Controllers;
 
 import com.btl.taskmanagement.Models.Music;
 import com.btl.taskmanagement.Models.Task;
-import com.btl.taskmanagement.ViewController;
+import com.btl.taskmanagement.AppManager;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
@@ -10,7 +10,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.File;
@@ -38,7 +37,7 @@ public class PomodoroController implements Initializable {
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
-		this.task = ViewController.selectedTask;
+		this.task = AppManager.selectedTask;
 		countdownLabel.setText(formatTime((int) task.getFocusTime().toSeconds()));
 		
 		timeline = new Timeline(new KeyFrame(Duration.seconds(1), _ -> updateCountdown()));
@@ -50,7 +49,7 @@ public class PomodoroController implements Initializable {
 			setUpListSong();
 		}
 		
-		ViewController.stage.setOnCloseRequest(event -> {
+		AppManager.stage.setOnCloseRequest(event -> {
 			event.consume();
 			try {
 				handleExit();
@@ -156,7 +155,8 @@ public class PomodoroController implements Initializable {
 	private void handleExit() throws IOException {
 		if (task.getTotalTime().greaterThanOrEqualTo(task.getMandatoryTime())) {
 			task.setTaskDone();
-			ViewController.switchToDayWindow();
+			AppManager.switchToDayWindow();
+			AppManager.stage.setOnCloseRequest(null);
 		} else {
 			Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 			alert.setTitle("Xác nhận thoát");
@@ -167,8 +167,8 @@ public class PomodoroController implements Initializable {
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.isPresent() && result.get() == ButtonType.OK) {
 				task.setTaskFailed();
-				ViewController.switchToDayWindow();
-				ViewController.stage.setOnCloseRequest(null);
+				AppManager.switchToDayWindow();
+				AppManager.stage.setOnCloseRequest(null);
 			}
 		}
 		if (mediaPlayer != null) {

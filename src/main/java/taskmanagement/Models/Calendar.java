@@ -1,7 +1,9 @@
-// Calendar.java
 package com.btl.taskmanagement.Models;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -11,7 +13,6 @@ import java.util.Map;
 public class Calendar implements Serializable {
 	@Serial
 	private static final long serialVersionUID = 1L;
-	
 	private final Map<LocalDate, Week> weeks = new HashMap<>();
 	private LocalDate startOfCurrentWeek;
 	
@@ -39,9 +40,10 @@ public class Calendar implements Serializable {
 	}
 	
 	private String getWeekFilePath(LocalDate weekStart) {
-		String userHome = System.getProperty("user.home");
-		return userHome + "/Documents/saved-weeks/" + weekStart.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + ".dat";
+		return Paths.get(System.getProperty("user.home"), "Documents", "saved-weeks",
+			weekStart.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + ".dat").toString();
 	}
+	
 	
 	public void setToNextWeek() {
 		startOfCurrentWeek = startOfCurrentWeek.plusWeeks(1);
@@ -63,12 +65,10 @@ public class Calendar implements Serializable {
 	}
 	
 	public void saveWeeksToFile() throws IOException {
-		String userHome = System.getProperty("user.home");
-		File directory = new File(userHome + "/Documents/saved-weeks");
-		if (!directory.exists()) {
-			directory.mkdirs();
+		Path directoryPath = Paths.get(System.getProperty("user.home"), "Documents", "saved-weeks");
+		if (Files.notExists(directoryPath)) {
+			Files.createDirectories(directoryPath);
 		}
-		
 		for (Map.Entry<LocalDate, Week> entry : weeks.entrySet()) {
 			LocalDate weekStart = entry.getKey();
 			Week week = entry.getValue();
@@ -78,9 +78,6 @@ public class Calendar implements Serializable {
 		}
 	}
 	
-	public Week getWeek(LocalDate date) {
-		return weeks.get(date);
-	}
 	
 	public Week getCurrentWeek() {
 		return weeks.get(startOfCurrentWeek);

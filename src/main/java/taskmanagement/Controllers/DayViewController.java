@@ -3,7 +3,7 @@ package com.btl.taskmanagement.Controllers;
 import com.btl.taskmanagement.Models.Day;
 import com.btl.taskmanagement.Models.Task;
 
-import com.btl.taskmanagement.ViewController;
+import com.btl.taskmanagement.AppManager;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -20,6 +20,7 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -42,13 +43,12 @@ public class DayViewController implements Initializable {
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
-		day = ViewController.selectedDay;
+		day = AppManager.selectedDay;
 		listView.setCellFactory(_ -> new TaskCellDayWindow());
 		listView.setItems(day.getTaskObservableList());
 		
 		dateLabel.setText(day.getDate().toString());
 		dateLabel.setFont(Font.font("System", FontWeight.BOLD, 12));
-		
 		
 		updateCompletion();
 		addImportanceLegend();
@@ -75,9 +75,6 @@ public class DayViewController implements Initializable {
 		TextField breakTimeField = new TextField();
 		breakTimeField.setPromptText("Thời gian nghỉ (phút)");
 
-		TextField taskCategoryField = new TextField();
-		taskCategoryField.setPromptText("Danh mục");
-
 		ChoiceBox<Task.Priority> importanceLevelChoiceBox = new ChoiceBox<>();
 		importanceLevelChoiceBox.setItems(FXCollections.observableArrayList(Task.Priority.values()));
 		importanceLevelChoiceBox.getSelectionModel().selectFirst();
@@ -91,7 +88,6 @@ public class DayViewController implements Initializable {
 				new Label("Thời gian bắt đầu:"), startTimeField,
 				new Label("Thời gian tập trung:"), focusTimeField,
 				new Label("Thời gian nghỉ:"), breakTimeField,
-				new Label("Danh mục:"), taskCategoryField,
 				new Label("Mức độ quan trọng:"), importanceLevelChoiceBox,
 				new Label("Thời gian bắt buộc:"), mandatoryTimeField
 		);
@@ -105,43 +101,54 @@ public class DayViewController implements Initializable {
 				LocalTime startTime = LocalTime.parse(startTimeField.getText(), DateTimeFormatter.ofPattern("H:mm"));
 				Duration focusTime = Duration.minutes(Integer.parseInt(focusTimeField.getText()));
 				Duration breakTime = Duration.minutes(Integer.parseInt(breakTimeField.getText()));
-				String taskCategory = taskCategoryField.getText();
 				Task.Priority importanceLevel = importanceLevelChoiceBox.getValue();
 				Duration mandatoryTime = Duration.minutes(Integer.parseInt(mandatoryTimeField.getText()));
 
-				Task newTask = new Task(taskName, startTime, focusTime, breakTime, taskCategory, importanceLevel, mandatoryTime);
-
-				if (!day.addTask(newTask)) {
+				Task newTask = new Task(taskName, startTime, focusTime, breakTime, importanceLevel, mandatoryTime);
+				
+				boolean isBeforeToday = day.getDate().isBefore(LocalDate.now());
+				boolean isTodayButBeforeNow = day.getDate().isEqual(LocalDate.now()) && newTask.getStartTime().isBefore(LocalTime.now());
+				
+				if(isBeforeToday || isTodayButBeforeNow) {
 					Alert alert = new Alert(Alert.AlertType.WARNING);
-					alert.setHeaderText("Trùng lịch công việc");
-					alert.setContentText("Thời gian của công việc này trùng với một công việc khác.");
+					alert.setHeaderText("Đã quá thời điểm bắt đầu task");
+					alert.setContentText("Không thể tạo công việc với thời gian bắt đầu trước thời điểm hiện tại. Vui lòng chọn thời gian bắt đầu phù hợp.");
 					alert.showAndWait();
-					event.consume(); // Ngăn dialog đóng
+					event.consume();
+					return;
 				}
+				if (isTimeConflict(newTask)) {
+					Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+					alert.setHeaderText("Thời gian của công việc này trùng với một công việc khác.");
+					alert.setContentText("Bạn có chắc chắn muốn tạo task này không ?");
+					Optional<ButtonType> result = alert.showAndWait();
+					if (result.isEmpty() || result.get() != ButtonType.OK) {
+						event.consume();
+						return;
+					}
+				}
+				day.addTask(newTask);
 			} catch (DateTimeParseException e) {
-				Alert alert = new Alert(Alert.AlertType.ERROR);
-				alert.setHeaderText("Lỗi định dạng");
-				alert.setContentText("Thời gian bắt đầu phải theo định dạng HH:mm.");
-				alert.showAndWait();
+				showErrorDialog("Lỗi định dạng", "Thời gian bắt đầu phải theo định dạng HH:mm.");
 				event.consume(); // Ngăn dialog đóng
 			} catch (NumberFormatException e) {
-				Alert alert = new Alert(Alert.AlertType.ERROR);
-				alert.setHeaderText("Lỗi định dạng");
-				alert.setContentText("Thời gian tập trung, nghỉ và bắt buộc phải là số nguyên.");
-				alert.showAndWait();
+				showErrorDialog("Lỗi định dạng", "Thời gian tập trung, nghỉ và bắt buộc phải là số nguyên.");
 				event.consume(); // Ngăn dialog đóng
 			} catch (Exception e) {
-				Alert alert = new Alert(Alert.AlertType.ERROR);
-				alert.setHeaderText("Dữ liệu không hợp lệ");
-				alert.setContentText("Vui lòng đảm bảo tất cả các trường đều được nhập đúng định dạng.");
-				alert.showAndWait();
+				showErrorDialog("Dữ liệu không hợp lệ", "Vui lòng đảm bảo tất cả các trường đều được nhập đúng định dạng.");
 				event.consume(); // Ngăn dialog đóng
 			}
 		});
-
 		dialog.showAndWait();
 	}
-
+	
+	private void showErrorDialog(String header, String content) {
+		Alert alert = new Alert(Alert.AlertType.ERROR);
+		alert.setHeaderText(header);
+		alert.setContentText(content);
+		alert.showAndWait();
+	}
+	
 	@FXML
 	public void handleDeleteTask() {
 		if(listView.getSelectionModel().getSelectedItem() != null) {
@@ -156,27 +163,33 @@ public class DayViewController implements Initializable {
 			listView.getSelectionModel().clearSelection();
 		}
 	}
-
+	
 	private void updateCompletion() {
-
-		double completedTasks = day.getTaskObservableList().stream().filter(Task::isDone).count();
-		double totalTasks = day.getTaskObservableList().size();
-		double completion = (totalTasks > 0) ? (completedTasks / totalTasks) : 0;
+		long completedTasks = day.getTaskObservableList().stream()
+			.filter(Task::isDone)
+			.count();
+		long totalTasks = day.getTaskObservableList().size();
+		double completion = (totalTasks > 0) ? (double) completedTasks / totalTasks : 0;
+		
 		completionBar.setProgress(completion);
-		completionPercentage = new Label(String.format("%.0f%%", completion * 100));
+		
+		completionPercentage.setText(String.format("%.0f%%", completion * 100));
 	}
-
-
+	
+	
+	
 	private void addImportanceLegend() {
+		Label text = new Label("Importance");
 		HBox lowPriority = createPriorityBox("LOW", Color.web("#A8E6CF"));
 		HBox mediumPriority = createPriorityBox("MEDIUM", Color.web("#FFD54F"));
 		HBox highPriority = createPriorityBox("HIGH", Color.web("#FFAB91"));
-
+		
 		lowPriority.setPadding(new Insets(5));
 		mediumPriority.setPadding(new Insets(5));
 		highPriority.setPadding(new Insets(5));
-
-		importanceLegendBox.getChildren().addAll(lowPriority, mediumPriority, highPriority);
+		text.setPadding(new Insets(5, 5, 0, 5));
+		
+		importanceLegendBox.getChildren().addAll(text, lowPriority, mediumPriority, highPriority);
 	}
 
 	private HBox createPriorityBox(String labelText, Color color) {
@@ -193,21 +206,21 @@ public class DayViewController implements Initializable {
 		if(listView.getSelectionModel().getSelectedItem() == null){
 			return;
 		}
-		if(ViewController.selectedTask.isReady()){
+		if(AppManager.selectedTask.isReady()){
 			Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 			alert.setContentText("Xác nhận bắt đầu làm việc");
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.isPresent() && result.get() == ButtonType.OK) {
-				ViewController.switchToPomodoroWindow();
+				AppManager.switchToPomodoroWindow();
 			}
 		}
-		else if(ViewController.selectedTask.isDone()){
+		else if(AppManager.selectedTask.isDone()){
 			Alert alert = new Alert(Alert.AlertType.INFORMATION);
 			alert.setHeaderText("TASK DONE");
 			alert.setContentText("Bạn đã hoàn thành công việc này rồi");
 			alert.show();
 		}
-		else if(ViewController.selectedTask.isFail()){
+		else if(AppManager.selectedTask.isFail()){
 			Alert alert = new Alert(Alert.AlertType.INFORMATION);
 			alert.setHeaderText("TASK FAILED");
 			alert.setContentText("Đã quá hạn để làm việc này");
@@ -217,6 +230,17 @@ public class DayViewController implements Initializable {
 	
 	@FXML
 	public void handleExitButton(){
-		ViewController.switchToMainWindow();
+		AppManager.switchToMainWindow();
+	}
+	
+	private boolean isTimeConflict(Task newTask) {
+		LocalTime newStart = newTask.getStartTime();
+		LocalTime newEnd = newStart.plusSeconds((long) newTask.getMandatoryTime().toSeconds());
+		
+		return day.getTaskObservableList().stream().anyMatch(existingTask -> {
+			LocalTime existingStart = existingTask.getStartTime();
+			LocalTime existingEnd = existingStart.plusSeconds((long) existingTask.getMandatoryTime().toSeconds());
+			return newStart.isBefore(existingEnd) && newEnd.isAfter(existingStart);
+		});
 	}
 }

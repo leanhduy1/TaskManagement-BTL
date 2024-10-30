@@ -1,7 +1,7 @@
 package com.btl.taskmanagement.Controllers;
 
 import com.btl.taskmanagement.Models.Task;
-import com.btl.taskmanagement.ViewController;
+import com.btl.taskmanagement.AppManager;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.geometry.Pos;
@@ -30,30 +30,11 @@ public class TaskCellDayWindow extends ListCell<Task> {
 			taskInfo.setVgap(5);
 			taskInfo.setHgap(10);
 			
-			Text taskName = new Text(item.getTaskName());
-			taskName.setFont(Font.font("System", FontWeight.BOLD, 14));
-			taskName.setFill(Color.BLACK);
-			taskInfo.add(taskName, 0, 0); // Tên nhiệm vụ ở hàng 0, cột 0
-			
-			Text startTime = new Text("Start: " + item.getStartTime());
-			startTime.setFont(Font.font("System", FontWeight.NORMAL, 12));
-			startTime.setFill(Color.BLACK);
-			taskInfo.add(startTime, 0, 1); // Thời gian bắt đầu ở hàng 1, cột 0
-			
-			Text mandatoryTime = new Text("Min: " + item.getMandatoryTime().toMinutes() + " min");
-			mandatoryTime.setFont(Font.font("System", FontWeight.NORMAL, 12));
-			mandatoryTime.setFill(Color.BLACK);
-			taskInfo.add(mandatoryTime, 1, 1); // Thời gian tối thiểu ở hàng 1, cột 1
-			
-			Text focusTime = new Text("Focus: " + item.getFocusTime().toMinutes() + " min");
-			focusTime.setFont(Font.font("System", FontWeight.NORMAL, 12));
-			focusTime.setFill(Color.BLACK);
-			taskInfo.add(focusTime, 0, 2); // Thời gian làm ở hàng 2, cột 0
-			
-			Text breakTime = new Text("Break: " + item.getBreakTime().toMinutes() + " min");
-			breakTime.setFont(Font.font("System", FontWeight.NORMAL, 12));
-			breakTime.setFill(Color.BLACK);
-			taskInfo.add(breakTime, 1, 2); // Thời gian nghỉ ở hàng 2, cột 1
+			addTaskInfo(taskInfo, item.getTaskName(), 0, 0, FontWeight.BOLD);
+			addTaskInfo(taskInfo, "Start time: " + item.getStartTime(), 0, 1, FontWeight.NORMAL);
+			addTaskInfo(taskInfo, "Minimum duration: " + item.getMandatoryTime().toMinutes() + " min", 1, 1, FontWeight.NORMAL);
+			addTaskInfo(taskInfo, "Focus interval: " + item.getFocusTime().toMinutes() + " min", 0, 2, FontWeight.NORMAL);
+			addTaskInfo(taskInfo, "Break interval: " + item.getBreakTime().toMinutes() + " min", 1, 2, FontWeight.NORMAL);
 			
 			BackgroundFill backgroundFill = switch (item.getImportanceLevel()) {
 				case LOW -> new BackgroundFill(Color.web("#A8E6CF"), new CornerRadii(5), Insets.EMPTY);
@@ -67,7 +48,7 @@ public class TaskCellDayWindow extends ListCell<Task> {
 				ColorAdjust colorAdjust = new ColorAdjust();
 				colorAdjust.setBrightness(-0.2);
 				cell.setEffect(colorAdjust);
-				ViewController.selectedTask = item;
+				AppManager.selectedTask = item;
 			} else {
 				cell.setEffect(null);
 			}
@@ -99,7 +80,6 @@ public class TaskCellDayWindow extends ListCell<Task> {
 			}, item.currentStateProperty());
 			
 			statusLabel.textProperty().bind(statusBinding);
-			
 			cell.getChildren().add(statusLabel);
 			
 			cell.setPrefHeight(80);
@@ -109,6 +89,13 @@ public class TaskCellDayWindow extends ListCell<Task> {
 			setGraphic(cell);
 			setText(null);
 		}
+	}
+
+	private void addTaskInfo(GridPane taskInfo, String text, int colIndex, int rowIndex, FontWeight fontWeight) {
+		Text textNode = new Text(text);
+		textNode.setFont(Font.font("System", fontWeight, 12));
+		textNode.setFill(Color.BLACK);
+		taskInfo.add(textNode, colIndex, rowIndex);
 	}
 	
 }

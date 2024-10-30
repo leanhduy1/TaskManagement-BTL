@@ -1,4 +1,3 @@
-// ViewController.java
 package com.btl.taskmanagement;
 
 import com.btl.taskmanagement.Controllers.StatusUpdateService;
@@ -13,12 +12,13 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class ViewController {
+public class AppManager {
 	public static Stage stage;
 	public static Scene mainWindow;
 	public static Calendar calendar;
 	public static Day selectedDay;
 	public static Task selectedTask;
+	
 	private static final StatusUpdateService statusUpdateService = new StatusUpdateService();
 	
 	public static void switchToDayWindow() throws IOException {
@@ -28,29 +28,30 @@ public class ViewController {
 			statusUpdateService.reset();
 			statusUpdateService.start();
 		}
-		FXMLLoader loader = new FXMLLoader(ViewController.class.getResource("/FXML/day-window.fxml"));
-		Parent root = loader.load();
-		Scene dayWindow = new Scene(root);
-		stage.setScene(dayWindow);
-		stage.show();
+		loadAndSetScene("/FXML/day-window.fxml");
 	}
 	
 	public static void switchToPomodoroWindow() throws IOException {
-		if (statusUpdateService.getState() == Worker.State.READY) {
+		if (statusUpdateService.isRunning()) {
 			statusUpdateService.cancel();
 		}
-		FXMLLoader loader = new FXMLLoader(ViewController.class.getResource("/FXML/pomodoro-window.fxml"));
-		Parent root = loader.load();
-		Scene pomodoroWindow = new Scene(root);
-		stage.setScene(pomodoroWindow);
-		stage.show();
+		loadAndSetScene("/FXML/pomodoro-window.fxml");
 	}
 	
 	public static void switchToMainWindow() {
-		if (statusUpdateService.getState() == Worker.State.READY) {
+		if (statusUpdateService.isRunning()) {
 			statusUpdateService.cancel();
 		}
 		stage.setScene(mainWindow);
 		stage.show();
 	}
+	
+	private static void loadAndSetScene(String fxmlPath) throws IOException {
+		FXMLLoader loader = new FXMLLoader(AppManager.class.getResource(fxmlPath));
+		Parent root = loader.load();
+		Scene scene = new Scene(root);
+		stage.setScene(scene);
+		stage.show();
+	}
+	
 }
