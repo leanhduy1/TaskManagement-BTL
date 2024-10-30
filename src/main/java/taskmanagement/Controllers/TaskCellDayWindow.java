@@ -1,7 +1,7 @@
-package com.btl.taskmanagement.Controllers;
+package taskmanagement.Controllers;
 
-import com.btl.taskmanagement.Models.Task;
-import com.btl.taskmanagement.AppManager;
+import taskmanagement.Models.Task;
+import taskmanagement.AppManager;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.geometry.Pos;

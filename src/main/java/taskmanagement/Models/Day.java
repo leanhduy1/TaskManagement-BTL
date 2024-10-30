@@ -1,4 +1,4 @@
-package com.btl.taskmanagement.Models;
+package taskmanagement.Models;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

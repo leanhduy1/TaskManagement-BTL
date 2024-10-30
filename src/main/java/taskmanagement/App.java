@@ -1,6 +1,6 @@
-package com.btl.taskmanagement;
+package taskmanagement;
 
-import com.btl.taskmanagement.Models.Calendar;
+import taskmanagement.Models.Calendar;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

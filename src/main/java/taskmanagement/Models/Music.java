@@ -1,4 +1,4 @@
-package com.btl.taskmanagement.Models;
+package taskmanagement.Models;
 
 import java.io.File;
 import java.net.URL;

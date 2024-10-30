@@ -1,7 +1,7 @@
-package com.btl.taskmanagement.Controllers;
+package taskmanagement.Controllers;
 
-import com.btl.taskmanagement.Models.Day;
-import com.btl.taskmanagement.AppManager;
+import taskmanagement.Models.Day;
+import taskmanagement.AppManager;
 import javafx.application.Platform;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;

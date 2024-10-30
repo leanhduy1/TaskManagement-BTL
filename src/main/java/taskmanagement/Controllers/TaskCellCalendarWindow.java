@@ -1,6 +1,6 @@
-package com.btl.taskmanagement.Controllers;
+package taskmanagement.Controllers;
 
-import com.btl.taskmanagement.Models.Task;
+import taskmanagement.Models.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;

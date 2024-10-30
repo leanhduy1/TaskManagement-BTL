@@ -1,9 +1,9 @@
-package com.btl.taskmanagement.Controllers;
+package taskmanagement.Controllers;
 
-import com.btl.taskmanagement.Models.Day;
-import com.btl.taskmanagement.Models.Task;
+import taskmanagement.Models.Day;
+import taskmanagement.Models.Task;
 
-import com.btl.taskmanagement.AppManager;
+import taskmanagement.AppManager;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

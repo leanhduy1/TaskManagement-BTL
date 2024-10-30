@@ -1,9 +1,9 @@
-package com.btl.taskmanagement.Controllers;
+package taskmanagement.Controllers;
 
-import com.btl.taskmanagement.Models.Calendar;
-import com.btl.taskmanagement.Models.Day;
-import com.btl.taskmanagement.Models.Task;
-import com.btl.taskmanagement.AppManager;
+import taskmanagement.Models.Calendar;
+import taskmanagement.Models.Day;
+import taskmanagement.Models.Task;
+import taskmanagement.AppManager;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

@@ -1,9 +1,9 @@
-package com.btl.taskmanagement;
+package taskmanagement;
 
-import com.btl.taskmanagement.Controllers.StatusUpdateService;
-import com.btl.taskmanagement.Models.Calendar;
-import com.btl.taskmanagement.Models.Day;
-import com.btl.taskmanagement.Models.Task;
+import taskmanagement.Controllers.StatusUpdateService;
+import taskmanagement.Models.Calendar;
+import taskmanagement.Models.Day;
+import taskmanagement.Models.Task;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

@@ -1,8 +1,9 @@
-package com.btl.taskmanagement.Controllers;
+package taskmanagement.Controllers;
 
-import com.btl.taskmanagement.Models.Music;
-import com.btl.taskmanagement.Models.Task;
-import com.btl.taskmanagement.AppManager;
+import javafx.scene.media.AudioClip;
+import taskmanagement.Models.Music;
+import taskmanagement.Models.Task;
+import taskmanagement.AppManager;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
@@ -15,11 +16,14 @@ import javafx.util.Duration;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class PomodoroController implements Initializable {
 	
+	private static final String NOTIFICATION_SOUND_PATH = "/Notification/notification.mp3";
+	private AudioClip notificationSound;
 	private Task task;
 	private Timeline timeline;
 	private Music music;
@@ -33,8 +37,6 @@ public class PomodoroController implements Initializable {
 	@FXML
 	private Button playPauseButton, exitButton;
 	
-	
-	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
 		this.task = AppManager.selectedTask;
@@ -43,9 +45,12 @@ public class PomodoroController implements Initializable {
 		timeline = new Timeline(new KeyFrame(Duration.seconds(1), _ -> updateCountdown()));
 		timeline.setCycleCount(Timeline.INDEFINITE);
 		
-		this.music = new Music();
+		notificationSound = new AudioClip(
+			Objects.requireNonNull(getClass().getResource(NOTIFICATION_SOUND_PATH)).toString()
+		);
 		
-		if(!music.getSongs().isEmpty()){
+		this.music = new Music();
+		if (!music.getSongs().isEmpty()) {
 			setUpListSong();
 		}
 		
@@ -59,14 +64,14 @@ public class PomodoroController implements Initializable {
 		});
 	}
 	
-	private void setUpListSong(){
+	private void setUpListSong() {
 		for (File song : music.getSongs()) {
-			songPicker.getItems().add(song.getName().substring(0, song.getName().lastIndexOf('.')));
+			songPicker.getItems().add(
+				song.getName().substring(0, song.getName().lastIndexOf('.'))
+			);
 		}
-		
 		songPicker.getSelectionModel().selectFirst();
 		loadSelectedSong();
-		
 		songPicker.getSelectionModel().selectedIndexProperty().addListener((_, _, newVal) -> {
 			songNumber = newVal.intValue();
 			loadSelectedSong();
@@ -77,6 +82,7 @@ public class PomodoroController implements Initializable {
 	private void loadSelectedSong() {
 		if (mediaPlayer != null && music.isPlaying()) {
 			mediaPlayer.stop();
+			mediaPlayer.dispose();
 			music.stopPlaying();
 		}
 		
@@ -88,7 +94,7 @@ public class PomodoroController implements Initializable {
 	
 	@FXML
 	public void handlePlayPause() {
-		if(music.getSongs().isEmpty()) return;
+		if (music.getSongs().isEmpty()) return;
 		
 		if (music.isPlaying()) {
 			mediaPlayer.pause();
@@ -104,12 +110,11 @@ public class PomodoroController implements Initializable {
 	private void updateCountdown() {
 		task.updateTime(Duration.seconds(1));
 		if (task.isFinishedSession()) {
+			notificationSound.play();
 			if (task.isBreak()) {
 				task.startFocus();
-				modeLabel.setText("Focus");
 			} else {
 				task.startBreak();
-				modeLabel.setText("Break");
 			}
 		}
 		updateUI();
@@ -117,7 +122,7 @@ public class PomodoroController implements Initializable {
 	
 	private void updateUI() {
 		countdownLabel.setText(formatTime((int) task.getSessionRemainingTime().toSeconds()));
-		totalTimeLabel.setText("Focused Time: " + formatTime((int) task.getTotalTime().toSeconds()));
+		totalTimeLabel.setText("Focused time: " + formatTime((int) task.getTotalTime().toSeconds()));
 	}
 	
 	private String formatTime(int seconds) {
@@ -155,8 +160,7 @@ public class PomodoroController implements Initializable {
 	private void handleExit() throws IOException {
 		if (task.getTotalTime().greaterThanOrEqualTo(task.getMandatoryTime())) {
 			task.setTaskDone();
-			AppManager.switchToDayWindow();
-			AppManager.stage.setOnCloseRequest(null);
+			exitToDayWindow();
 		} else {
 			Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 			alert.setTitle("Xác nhận thoát");
@@ -167,12 +171,17 @@ public class PomodoroController implements Initializable {
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.isPresent() && result.get() == ButtonType.OK) {
 				task.setTaskFailed();
-				AppManager.switchToDayWindow();
-				AppManager.stage.setOnCloseRequest(null);
+				exitToDayWindow();
 			}
 		}
 		if (mediaPlayer != null) {
 			mediaPlayer.stop();
 		}
+	}
+	
+	private void exitToDayWindow() throws IOException {
+		if (mediaPlayer != null) mediaPlayer.stop();
+		AppManager.switchToDayWindow();
+		AppManager.stage.setOnCloseRequest(null);
 	}
 }
