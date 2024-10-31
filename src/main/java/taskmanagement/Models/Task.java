@@ -1,5 +1,10 @@
 package taskmanagement.Models;
 
+/*
+Task chứa các thông tin cơ bản về thời điểm bắt đầu, các quãng làm và nghỉ, thời gian bắt buộc, ...
+Tạo phương thức theo dõi và cập nhật tổng thời gian làm và thời gian trôi qua trong các quãng
+*/
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalTime;

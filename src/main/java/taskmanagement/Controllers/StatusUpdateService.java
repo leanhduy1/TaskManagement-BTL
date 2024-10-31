@@ -1,5 +1,7 @@
 package taskmanagement.Controllers;
 
+// Chạy dịch vụ ngầm để đánh fail các task đã quá hạn theo thời gian thực
+
 import taskmanagement.Models.Day;
 import taskmanagement.AppManager;
 import javafx.application.Platform;

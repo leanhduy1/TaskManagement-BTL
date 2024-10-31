@@ -1,5 +1,7 @@
 package taskmanagement.Models;
 
+// Day object chứa các task và xử lý thêm hay xóa task
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import java.io.Serial;

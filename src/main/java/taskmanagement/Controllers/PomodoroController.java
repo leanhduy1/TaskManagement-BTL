@@ -1,5 +1,12 @@
 package taskmanagement.Controllers;
 
+/*
+Tạo 1 bộ đếm thời gian đếm ngược session
+Xử lý sự kiện 2 nút start và stop task
+Thêm 1 bộ phát nhạc bằng media player và nạp các bài hát vào 1 hộp chọn
+Cảnh báo nếu thoát trước khi hooàn thành task
+*/
+
 import javafx.scene.media.AudioClip;
 import taskmanagement.Models.Music;
 import taskmanagement.Models.Task;
