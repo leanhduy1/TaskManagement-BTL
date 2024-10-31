@@ -18,6 +18,8 @@ public class Day implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private final LocalDate date;
+	/* Dùng observable list để list view phần UI tự động cập nhật danh sách các task
+	Observable list không lưu được nên để transient và tạo 1 list khác chỉ để lưu */
 	private transient ObservableList<Task> taskObservableList;
 	private List<Task> serializableList;
 	
@@ -32,6 +34,7 @@ public class Day implements Serializable {
 	
 	public void addTask(Task task) {
 		taskObservableList.add(task);
+		// add xong sort lại theo thời gian bắt đầu
 		sortTasksByTime();
 	}
 	
@@ -47,12 +50,14 @@ public class Day implements Serializable {
 		taskObservableList.sort(Comparator.comparing(Task::getStartTime));
 	}
 	
+	// Copy các task trong observable list để lưu lại
 	@Serial
 	private void writeObject(ObjectOutputStream oos) throws IOException {
 		serializableList = new ArrayList<>(taskObservableList);
 		oos.defaultWriteObject();
 	}
 	
+	// Tạo lại observable list
 	@Serial
 	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
 		ois.defaultReadObject();

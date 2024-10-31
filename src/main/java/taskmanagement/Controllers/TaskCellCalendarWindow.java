@@ -1,5 +1,7 @@
 package taskmanagement.Controllers;
 
+// Custom cell cho các list view trong cửa sổ chính
+
 import taskmanagement.Models.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -31,6 +33,7 @@ public class TaskCellCalendarWindow extends ListCell<Task> {
 			container.setAlignment(Pos.CENTER);
 			container.setPadding(new Insets(5));
 			
+			// Đặt màu tương ứng với độ quan trong
 			BackgroundFill backgroundFill = switch (task.getImportanceLevel()) {
 				case LOW -> new BackgroundFill(Color.web("#A8E6CF"), new CornerRadii(5), Insets.EMPTY);
 				case MEDIUM -> new BackgroundFill(Color.web("#FFD54F"), new CornerRadii(5), Insets.EMPTY);

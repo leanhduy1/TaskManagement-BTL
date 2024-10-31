@@ -1,5 +1,7 @@
 package taskmanagement.Controllers;
 
+// Custom cell cho list view trong cửa sổ ngày
+
 import taskmanagement.Models.Task;
 import taskmanagement.AppManager;
 import javafx.beans.binding.Bindings;
@@ -30,20 +32,22 @@ public class TaskCellDayWindow extends ListCell<Task> {
 			taskInfo.setVgap(5);
 			taskInfo.setHgap(10);
 			
+			// Thêm thông tin vào grid pane info
 			addTaskInfo(taskInfo, item.getTaskName(), 0, 0, FontWeight.BOLD);
 			addTaskInfo(taskInfo, "Start time: " + item.getStartTime(), 0, 1, FontWeight.NORMAL);
 			addTaskInfo(taskInfo, "Minimum duration: " + item.getMandatoryTime().toMinutes() + " min", 1, 1, FontWeight.NORMAL);
 			addTaskInfo(taskInfo, "Focus interval: " + item.getFocusTime().toMinutes() + " min", 0, 2, FontWeight.NORMAL);
 			addTaskInfo(taskInfo, "Break interval: " + item.getBreakTime().toMinutes() + " min", 1, 2, FontWeight.NORMAL);
 			
+			// Đặt màu dựa trên độ quan trọng
 			BackgroundFill backgroundFill = switch (item.getImportanceLevel()) {
 				case LOW -> new BackgroundFill(Color.web("#A8E6CF"), new CornerRadii(5), Insets.EMPTY);
 				case MEDIUM -> new BackgroundFill(Color.web("#FFD54F"), new CornerRadii(5), Insets.EMPTY);
 				case HIGH -> new BackgroundFill(Color.web("#FFAB91"), new CornerRadii(5), Insets.EMPTY);
 			};
-			
 			cell.setBackground(new Background(backgroundFill));
 			
+			// Thay đổi màu của cell được select
 			if (isSelected()) {
 				ColorAdjust colorAdjust = new ColorAdjust();
 				colorAdjust.setBrightness(-0.2);
@@ -53,20 +57,12 @@ public class TaskCellDayWindow extends ListCell<Task> {
 				cell.setEffect(null);
 			}
 			
-			cell.getChildren().addAll(taskInfo);
-			
-			
-			Region spacer = new Region();
-			HBox.setHgrow(spacer, Priority.ALWAYS);
-			cell.getChildren().add(spacer);
-			
-			
 			Label statusLabel = new Label();
 			statusLabel.setFont(Font.font("System", FontWeight.BOLD, 12));
 			statusLabel.setBackground(new Background(new BackgroundFill(Color.web("#F0F0F0"), new CornerRadii(5), Insets.EMPTY)));
 			statusLabel.setPadding(new Insets(5));
 			statusLabel.setTextFill(Color.BLACK);
-			
+			// Gán status label với trạng thái của task
 			StringBinding statusBinding = Bindings.createStringBinding(() -> {
 				Task.State state = item.currentStateProperty().get();
 				return switch (state) {
@@ -78,10 +74,13 @@ public class TaskCellDayWindow extends ListCell<Task> {
 					case STOPPED -> "STOPPED";
 				};
 			}, item.currentStateProperty());
-			
 			statusLabel.textProperty().bind(statusBinding);
-			cell.getChildren().add(statusLabel);
 			
+			// Thêm khoảng không gian để phần status label luôn nằm bên phải
+			Region spacer = new Region();
+			HBox.setHgrow(spacer, Priority.ALWAYS);
+			
+			cell.getChildren().addAll(taskInfo, spacer, statusLabel);
 			cell.setPrefHeight(80);
 			cell.setAlignment(Pos.CENTER_LEFT);
 			cell.setPadding(new Insets(10, 10, 10, 10));

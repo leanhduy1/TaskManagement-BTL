@@ -1,5 +1,11 @@
 package taskmanagement;
 
+/*
+Class quản lý việc điều hướng giữa các scene và chứa các thuộc tính static
+dựa trên nhu cầu có các biến global có thể truy cập từ mọi nơi trong mã nguồn
+selectedDay và selectedTask là các đối tượng được quản lý bởi controller tương ứng
+*/
+
 import taskmanagement.Controllers.StatusUpdateService;
 import taskmanagement.Models.Calendar;
 import taskmanagement.Models.Day;
@@ -9,7 +15,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 
 public class AppManager {
@@ -21,6 +26,7 @@ public class AppManager {
 	
 	private static final StatusUpdateService statusUpdateService = new StatusUpdateService();
 	
+	// Chỉ bật service cập nhật task fail khi vào DayWindow
 	public static void switchToDayWindow() throws IOException {
 		if (statusUpdateService.getState() == Worker.State.READY) {
 			statusUpdateService.start();
@@ -53,5 +59,4 @@ public class AppManager {
 		stage.setScene(scene);
 		stage.show();
 	}
-	
 }

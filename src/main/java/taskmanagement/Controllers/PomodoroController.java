@@ -23,11 +23,11 @@ import java.util.ResourceBundle;
 public class PomodoroController implements Initializable {
 	
 	private static final String NOTIFICATION_SOUND_PATH = "/Notification/notification.mp3";
-	private AudioClip notificationSound;
+	private AudioClip notificationSound; // phát thông báo đã kết thúc session
 	private Task task;
 	private Timeline timeline;
 	private Music music;
-	private int songNumber;
+	private int songNumber; // Theo dõi bài hát hiện tại được chọn
 	private MediaPlayer mediaPlayer;
 	
 	@FXML
@@ -42,6 +42,7 @@ public class PomodoroController implements Initializable {
 		this.task = AppManager.selectedTask;
 		countdownLabel.setText(formatTime((int) task.getFocusTime().toSeconds()));
 		
+		// Dùng 1 label hiển thị thời gian và update bằng TimeLine mỗi 1 giây để làm bộ đếm thời gian session
 		timeline = new Timeline(new KeyFrame(Duration.seconds(1), _ -> updateCountdown()));
 		timeline.setCycleCount(Timeline.INDEFINITE);
 		
@@ -54,6 +55,7 @@ public class PomodoroController implements Initializable {
 			setUpListSong();
 		}
 		
+		// Đặt xử lý sự kiện thoát cho nút thoát X
 		AppManager.stage.setOnCloseRequest(event -> {
 			event.consume();
 			try {
@@ -64,65 +66,46 @@ public class PomodoroController implements Initializable {
 		});
 	}
 	
-	private void setUpListSong() {
-		for (File song : music.getSongs()) {
-			songPicker.getItems().add(
-				song.getName().substring(0, song.getName().lastIndexOf('.'))
-			);
-		}
-		songPicker.getSelectionModel().selectFirst();
-		loadSelectedSong();
-		songPicker.getSelectionModel().selectedIndexProperty().addListener((_, _, newVal) -> {
-			songNumber = newVal.intValue();
-			loadSelectedSong();
-			playPauseButton.setText("Play");
-		});
-	}
-	
-	private void loadSelectedSong() {
-		if (mediaPlayer != null && music.isPlaying()) {
-			mediaPlayer.stop();
-			mediaPlayer.dispose();
-			music.stopPlaying();
-		}
-		
-		File selectedSong = music.getSongs().get(songNumber);
-		Media media = new Media(selectedSong.toURI().toString());
-		mediaPlayer = new MediaPlayer(media);
-		mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
-	}
-	
-	@FXML
-	public void handlePlayPause() {
-		if (music.getSongs().isEmpty()) return;
-		
-		if (music.isPlaying()) {
-			mediaPlayer.pause();
-			music.stopPlaying();
-			playPauseButton.setText("Play");
-		} else {
-			mediaPlayer.play();
-			music.startPlaying();
-			playPauseButton.setText("Pause");
-		}
-	}
-	
+	// Cập nhật thời gian từng giây và nếu kết thúc session thì bật thông báo và chuyển session
 	private void updateCountdown() {
 		task.updateTime(Duration.seconds(1));
 		if (task.isFinishedSession()) {
 			notificationSound.play();
 			if (task.isBreak()) {
 				task.startFocus();
+				modeLabel.setText("Focus");
 			} else {
 				task.startBreak();
+				modeLabel.setText("Break");
 			}
 		}
-		updateUI();
+		updateTimeLabel();
 	}
 	
-	private void updateUI() {
+	// Vào trạng thái focus và bật bộ đếm
+	@FXML
+	public void startPomodoroButton() {
+		if (!task.isRunning()) {
+			task.startFocus();
+			updateTimeLabel();
+			modeLabel.setText("Focus");
+			timeline.play();
+		}
+	}
+	
+	// Vào trạng thái stop và tắt bộ đếm
+	@FXML
+	public void stopPomodoroButton() {
+		if (task.isRunning()) {
+			task.stop();
+			timeline.stop();
+			modeLabel.setText("Stop");
+		}
+	}
+	
+	private void updateTimeLabel() {
 		countdownLabel.setText(formatTime((int) task.getSessionRemainingTime().toSeconds()));
-		totalTimeLabel.setText("Focused time: " + formatTime((int) task.getTotalTime().toSeconds()));
+		totalTimeLabel.setText("Focused time: " + formatTime((int) task.getTotalFocusTime().toSeconds()));
 	}
 	
 	private String formatTime(int seconds) {
@@ -137,34 +120,15 @@ public class PomodoroController implements Initializable {
 		}
 	}
 	
-	@FXML
-	public void startPomodoro() {
-		if (!task.isRunning()) {
-			task.startFocus();
-			updateUI();
-			timeline.play();
-			modeLabel.setText("Focus");
-		}
-	}
-	
-	@FXML
-	public void stopPomodoro() {
-		if (task.isRunning()) {
-			task.stop();
-			timeline.stop();
-			modeLabel.setText("Break");
-		}
-	}
-	
+	// Thoát cửa sổ pomodoro và thông báo xác nhận nếu chưa hoàn thành công việc
 	@FXML
 	private void handleExit() throws IOException {
-		if (task.getTotalTime().greaterThanOrEqualTo(task.getMandatoryTime())) {
-			task.setTaskDone();
+		if (task.isDone()) {
 			exitToDayWindow();
 		} else {
 			Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 			alert.setTitle("Xác nhận thoát");
-			int totalRemainTime = (int) task.getMandatoryTime().subtract(task.getTotalTime()).toSeconds();
+			int totalRemainTime = (int) task.getMandatoryTime().subtract(task.getTotalFocusTime()).toSeconds();
 			int minutes = totalRemainTime / 60;
 			int seconds = totalRemainTime % 60;
 			alert.setContentText(String.format("Còn %d phút %d giây nữa để hoàn thành\nTask sẽ tính là không hoàn thành nếu bạn thoát bây giờ", minutes, seconds));
@@ -174,14 +138,61 @@ public class PomodoroController implements Initializable {
 				exitToDayWindow();
 			}
 		}
-		if (mediaPlayer != null) {
-			mediaPlayer.stop();
-		}
 	}
 	
 	private void exitToDayWindow() throws IOException {
 		if (mediaPlayer != null) mediaPlayer.stop();
 		AppManager.switchToDayWindow();
 		AppManager.stage.setOnCloseRequest(null);
+		if (mediaPlayer != null) {
+			mediaPlayer.stop();
+		}
+	}
+	
+	private void setUpListSong() {
+		// Nạp danh sách bài hát vào combo box
+		for (File song : music.getSongs()) {
+			songPicker.getItems().add(
+				song.getName().substring(0, song.getName().lastIndexOf('.'))
+			);
+		}
+		songPicker.getSelectionModel().selectFirst();
+		loadSelectedSong();
+		
+		songPicker.getSelectionModel().selectedIndexProperty().addListener((_, _, newVal) -> {
+			songNumber = newVal.intValue();
+			loadSelectedSong();
+			playPauseButton.setText("Play");
+		});
+	}
+	
+	private void loadSelectedSong() {
+		// Việc chọn bài hát sẽ làm dừng bài hát hiện tại đang phát
+		if (mediaPlayer != null && music.isPlaying()) {
+			mediaPlayer.stop();
+			mediaPlayer.dispose();
+			music.stopPlaying();
+		}
+		// Cập nhật bài bài hát hiện tại cho media phát
+		File selectedSong = music.getSongs().get(songNumber);
+		Media media = new Media(selectedSong.toURI().toString());
+		mediaPlayer = new MediaPlayer(media);
+		mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+	}
+	
+	// Sử dụng 1 nút bấm để xử lý việc dừng và phát nhạc
+	@FXML
+	public void handlePlayPause() {
+		if (music.getSongs().isEmpty()) return;
+		
+		if (music.isPlaying()) {
+			mediaPlayer.pause();
+			music.stopPlaying();
+			playPauseButton.setText("Play");
+		} else {
+			mediaPlayer.play();
+			music.startPlaying();
+			playPauseButton.setText("Pause");
+		}
 	}
 }

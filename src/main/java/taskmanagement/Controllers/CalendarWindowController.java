@@ -1,5 +1,11 @@
 package taskmanagement.Controllers;
 
+/* Đặt 7 list view tương ứng với 7 ngày trong tuần
+Tuần hiện tại sẽ được thay đổi bởi 2 nút next và previous hoặc chọn trong date picker
+Khi tuần hiện tại thay đổi các task trong tuần được nạp lại vào các list view
+Đặt sự kiện khi click vào list view nào sẽ chuyển sang cửa sổ ngày tương ứng
+*/
+
 import taskmanagement.Models.Calendar;
 import taskmanagement.Models.Day;
 import taskmanagement.Models.Task;
@@ -15,7 +21,6 @@ import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
 import java.net.URL;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.IntStream;
@@ -41,7 +46,7 @@ public class CalendarWindowController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         calendar = AppManager.calendar;
-        datePicker.setValue(LocalDate.now());
+        datePicker.setValue(calendar.getStartOfCurrentWeek());
         
         listViews = List.of(mondayListView, tuesdayListView, wednesdayListView, thursdayListView, fridayListView, saturdayListView, sundayListView);
         labels = List.of(mondayLabel, tuesdayLabel, wednesdayLabel, thursdayLabel, fridayLabel, saturdayLabel, sundayLabel);
@@ -50,18 +55,23 @@ public class CalendarWindowController implements Initializable {
         updateListViews();
         setupListViewWidths();
         
+        // Lắng nghe khi nào thay đổi kích thước cửa sổ để tính toán lại kích thước list view
         rootPane.widthProperty().addListener((obs, oldWidth, newWidth) -> setupListViewWidths());
     }
     
+    // Đặt custom cell cho các list view
     private void setupListViewCellFactories() {
         listViews.forEach(listView -> listView.setCellFactory(_ -> new TaskCellCalendarWindow()));
     }
     
+    // Đặt các task của các ngày trong tuần vào list view tương ứng
     public void updateListViews() {
         List<Day> dayList = calendar.getCurrentWeek().getDayList();
         IntStream.range(0, listViews.size()).forEach(i -> listViews.get(i).setItems(dayList.get(i).getTaskObservableList()));
     }
     
+    /* Tính toán kích thước list view và label sao cho fit với chiều ngang của cửa sổ
+    và cách 1 cạnh trên 1 khoảng cố định */
     private void setupListViewWidths() {
         double width = rootPane.getWidth() / listViews.size();
         
@@ -77,11 +87,12 @@ public class CalendarWindowController implements Initializable {
         });
     }
     
+    // Chuyển sang cửa sổ ngày tương ứng khi list view được click
     @FXML
     public void handleDayClick(int dayIndex) throws IOException {
         AppManager.selectedDay = calendar.getCurrentWeek().getDayList().get(dayIndex);
         AppManager.switchToDayWindow();
-        listViews.get(dayIndex).getSelectionModel().clearSelection();
+        listViews.get(dayIndex).getSelectionModel().clearSelection(); // làm mất hiệu ứng được chọn sau khi xử lý xong
     }
     
     @FXML
@@ -99,6 +110,8 @@ public class CalendarWindowController implements Initializable {
     @FXML
     public void sundayClicked() throws IOException { handleDayClick(6); }
     
+    /* biến bool isUpdatingDatePicker theo dõi liệu date picker bị thay đổi
+    do được pick trực tiếp hay do nút next và previous */
     @FXML
     private void handleChangeDate() {
         if (!isUpdatingDatePicker && datePicker.getValue() != null) {
@@ -121,6 +134,7 @@ public class CalendarWindowController implements Initializable {
         updateListViews();
     }
     
+    // Thay đổi date picker khi sử dụng nút next hoặc previous
     private void updateDatePicker() {
         isUpdatingDatePicker = true;
         datePicker.setValue(calendar.getStartOfCurrentWeek());

@@ -25,7 +25,7 @@
    </HBox>
    <StackPane layoutX="38.0" layoutY="38.0" prefHeight="33.0" prefWidth="205.0" AnchorPane.leftAnchor="100.0">
       <ProgressBar fx:id="completionBar" prefHeight="22.0" prefWidth="200.0" progress="0.0" />
-      <Label fx:id="completionPercentage" alignment="CENTER" prefHeight="18.0" prefWidth="26.0" style="-fx-background-color: transparent;" text="0%" />
+      <Label fx:id="completionPercentage" alignment="CENTER" prefHeight="18.0" prefWidth="37.0" style="-fx-background-color: transparent;" text="0%" />
    </StackPane>
    <VBox fx:id="importanceLegendBox" layoutX="500.0" layoutY="68.0" prefHeight="78.0" prefWidth="80.0" style="-fx-background-color: #f0f0f0; -fx-background-radius: 5;" AnchorPane.rightAnchor="20.0" />
    <Label fx:id="dateLabel" alignment="CENTER" layoutX="400.0" layoutY="46.0" prefHeight="22.0" prefWidth="100.0" style="-fx-background-color: #f0f0f0; -fx-background-radius: 5;" textAlignment="CENTER" AnchorPane.rightAnchor="100.0" />

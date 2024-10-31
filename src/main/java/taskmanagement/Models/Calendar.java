@@ -1,5 +1,7 @@
 package taskmanagement.Models;
 
+// Calendar dùng để tải và lưu lại các week object
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,6 +18,7 @@ public class Calendar implements Serializable {
 	private final Map<LocalDate, Week> weeks = new HashMap<>();
 	private LocalDate startOfCurrentWeek;
 	
+	// Đặt startOfCurrentWeek là đầu tuần
 	public Calendar() {
 		this.startOfCurrentWeek = LocalDate.now().with(DayOfWeek.MONDAY);
 		updateWeekMap();
@@ -27,6 +30,7 @@ public class Calendar implements Serializable {
 		}
 	}
 	
+	// Trả về 1 week object đã được lưu hoặc 1 object mới nếu chưa có
 	private Week loadWeek() {
 		File file = new File(getWeekFilePath(startOfCurrentWeek));
 		if (!file.exists()) {
@@ -39,6 +43,7 @@ public class Calendar implements Serializable {
 		}
 	}
 	
+	// Trả về đường dẫn tới week object file
 	private String getWeekFilePath(LocalDate weekStart) {
 		return Paths.get(System.getProperty("user.home"), "Documents", "saved-weeks",
 			weekStart.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + ".dat").toString();
@@ -55,6 +60,7 @@ public class Calendar implements Serializable {
 		updateWeekMap();
 	}
 	
+	// Trả về đầu tuần của 1 date
 	public void setToAnotherWeek(LocalDate date) {
 		startOfCurrentWeek = date.with(DayOfWeek.MONDAY);
 		updateWeekMap();
@@ -64,8 +70,10 @@ public class Calendar implements Serializable {
 		return startOfCurrentWeek;
 	}
 	
+	// Lưu các week object có trong map lại
 	public void saveWeeksToFile() throws IOException {
 		Path directoryPath = Paths.get(System.getProperty("user.home"), "Documents", "saved-weeks");
+		// Tạo thư mục saved-weeks trong thư mục Documents
 		if (Files.notExists(directoryPath)) {
 			Files.createDirectories(directoryPath);
 		}
