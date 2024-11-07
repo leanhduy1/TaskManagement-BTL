@@ -36,8 +36,11 @@ public class Day implements Serializable {
 	
 	public void addTask(Task task) {
 		taskObservableList.add(task);
-		// add xong sort lại theo thời gian bắt đầu
 		sortTasksByTime();
+	}
+	
+	private void sortTasksByTime() {
+		taskObservableList.sort(Comparator.comparing(Task::getStartTime));
 	}
 	
 	public void removeTask(Task task) {
@@ -46,10 +49,6 @@ public class Day implements Serializable {
 	
 	public ObservableList<Task> getTaskObservableList() {
 		return taskObservableList;
-	}
-	
-	private void sortTasksByTime() {
-		taskObservableList.sort(Comparator.comparing(Task::getStartTime));
 	}
 	
 	// Copy các task trong observable list để lưu lại

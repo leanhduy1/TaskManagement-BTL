@@ -67,11 +67,9 @@ public class DayViewController implements Initializable {
 		Dialog<Task> dialog = new Dialog<>();
 		dialog.setTitle("Thêm công việc mới");
 		dialog.setHeaderText("Nhập chi tiết cho công việc mới");
-
 		ButtonType addButtonType = new ButtonType("Thêm", ButtonBar.ButtonData.OK_DONE);
 		dialog.getDialogPane().getButtonTypes().addAll(addButtonType, ButtonType.CANCEL);
 		
-		// Tạo các trường nhập thông tin của công việc
 		TextField taskNameField = new TextField();
 		taskNameField.setPromptText("Tên công việc");
 
@@ -116,22 +114,19 @@ public class DayViewController implements Initializable {
 				Duration mandatoryTime = Duration.minutes(Integer.parseInt(mandatoryTimeField.getText()));
 
 				Task newTask = new Task(taskName, startTime, focusTime, breakTime, importanceLevel, mandatoryTime);
-				
 				boolean valid = true;
 				boolean isBeforeToday = day.getDate().isBefore(LocalDate.now());
-				boolean isTodayButBeforeNow = day.getDate().isEqual(LocalDate.now()) && newTask.getStartTime().isBefore(LocalTime.now());
-				
-				// Chặn việc tạo task có start time trước thời điểm hiện tại
+				boolean isTodayButBeforeNow = day.getDate().isEqual(LocalDate.now())
+					&& newTask.getStartTime().isBefore(LocalTime.now());
 				if(isBeforeToday || isTodayButBeforeNow) {
 					Alert alert = new Alert(Alert.AlertType.WARNING);
 					alert.setHeaderText("Đã quá thời điểm bắt đầu task");
-					alert.setContentText("Không thể tạo công việc với thời gian bắt đầu trước thời điểm hiện tại. Vui lòng chọn thời gian bắt đầu phù hợp.");
+					alert.setContentText("Không thể tạo công việc với thời gian bắt đầu trước thời điểm hiện tại" +
+						". Vui lòng chọn thời gian bắt đầu phù hợp.");
 					alert.showAndWait();
 					event.consume();
 					valid = false;
 				}
-				
-				// Xác nhận có tạo task với thời gian làm việc bị trùng lặp không
 				if (isTimeConflict(newTask)) {
 					Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 					alert.setHeaderText("Thời gian của công việc này trùng với một công việc khác.");

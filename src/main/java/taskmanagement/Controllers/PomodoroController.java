@@ -136,9 +136,9 @@ public class PomodoroController implements Initializable {
 			Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 			alert.setTitle("Xác nhận thoát");
 			int totalRemainTime = (int) task.getMandatoryTime().subtract(task.getTotalFocusTime()).toSeconds();
-			int minutes = totalRemainTime / 60;
-			int seconds = totalRemainTime % 60;
-			alert.setContentText(String.format("Còn %d phút %d giây nữa để hoàn thành\nTask sẽ tính là không hoàn thành nếu bạn thoát bây giờ", minutes, seconds));
+			int minutes = totalRemainTime / 60, seconds = totalRemainTime % 60;
+			alert.setContentText(String.format("Còn %d phút %d giây nữa để hoàn thành" +
+				"\nTask sẽ tính là không hoàn thành nếu bạn thoát bây giờ", minutes, seconds));
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.isPresent() && result.get() == ButtonType.OK) {
 				task.setTaskFailed();
@@ -146,7 +146,6 @@ public class PomodoroController implements Initializable {
 			}
 		}
 	}
-	
 	private void exitToDayWindow() throws IOException {
 		if (mediaPlayer != null) mediaPlayer.stop();
 		AppManager.switchToDayWindow();

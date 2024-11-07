@@ -24,13 +24,13 @@ public class Calendar implements Serializable {
 		updateWeekMap();
 	}
 	
+	// Them week vao map
 	public void updateWeekMap() {
 		if(!weeks.containsKey(startOfCurrentWeek)) {
 			weeks.put(startOfCurrentWeek, loadWeek());
 		}
 	}
 	
-	// Trả về 1 week object đã được lưu hoặc 1 object mới nếu chưa có
 	private Week loadWeek() {
 		File file = new File(getWeekFilePath(startOfCurrentWeek));
 		if (!file.exists()) {
@@ -43,12 +43,27 @@ public class Calendar implements Serializable {
 		}
 	}
 	
-	// Trả về đường dẫn tới week object file
-	private String getWeekFilePath(LocalDate weekStart) {
-		return Paths.get(System.getProperty("user.home"), "Documents", "saved-weeks",
-			weekStart.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + ".dat").toString();
+	public void saveWeeksToFile() throws IOException {
+		Path directoryPath = Paths.get(System.getProperty("user.home"), "Documents", "saved-weeks");
+		if (Files.notExists(directoryPath)) {
+			Files.createDirectories(directoryPath);
+		}
+		for (Map.Entry<LocalDate, Week> entry : weeks.entrySet()) {
+			LocalDate weekStart = entry.getKey();
+			Week week = entry.getValue();
+			try (ObjectOutputStream oos = new ObjectOutputStream(
+				new FileOutputStream(getWeekFilePath(weekStart)))) {
+				oos.writeObject(week);
+			}
+		}
 	}
 	
+	private String getWeekFilePath(LocalDate weekStart) {
+		return Paths.get(System.getProperty("user.home"),
+			"Documents",
+			"saved-weeks",
+			weekStart.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + ".dat").toString();
+	}
 	
 	public void setToNextWeek() {
 		startOfCurrentWeek = startOfCurrentWeek.plusWeeks(1);
@@ -69,23 +84,6 @@ public class Calendar implements Serializable {
 	public LocalDate getStartOfCurrentWeek() {
 		return startOfCurrentWeek;
 	}
-	
-	// Lưu các week object có trong map lại
-	public void saveWeeksToFile() throws IOException {
-		Path directoryPath = Paths.get(System.getProperty("user.home"), "Documents", "saved-weeks");
-		// Tạo thư mục saved-weeks trong thư mục Documents
-		if (Files.notExists(directoryPath)) {
-			Files.createDirectories(directoryPath);
-		}
-		for (Map.Entry<LocalDate, Week> entry : weeks.entrySet()) {
-			LocalDate weekStart = entry.getKey();
-			Week week = entry.getValue();
-			try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(getWeekFilePath(weekStart)))) {
-				oos.writeObject(week);
-			}
-		}
-	}
-	
 	
 	public Week getCurrentWeek() {
 		return weeks.get(startOfCurrentWeek);
